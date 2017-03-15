@@ -1,0 +1,23 @@
+#ifndef LIST_H
+#define LIST_H
+
+#include <LinkedList.h>
+#include <Adafruit_Sensor.h>
+
+// Extension of LinkedList to allow access to the first and last node
+//template<typename T>
+class Tracer : LinkedList<sensors_event_t>
+{
+public:
+	sensors_event_t* getLast()
+	{
+		return &last->data;
+	}
+	
+	sensors_event_t* getFirst()
+	{
+		return &root->data;
+	}
+};
+
+#endif // LIST_H
