@@ -6,7 +6,7 @@
 
 // Extension of LinkedList to allow access to the first and last node
 //template<typename T>
-class Tracer : LinkedList<sensors_event_t>
+class Tracer : public LinkedList<sensors_event_t>
 {
 public:
 	sensors_event_t* getLast()

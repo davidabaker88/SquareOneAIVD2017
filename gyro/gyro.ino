@@ -11,7 +11,7 @@ void setup(void)
   gyro.setup();
 }
 
-void loop(void) 
+void loop(void)
 {
   gyro.loop();
   delay(100);

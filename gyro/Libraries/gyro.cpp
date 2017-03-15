@@ -3,6 +3,7 @@
 Gyro::Gyro(int sensorID)
 {
     m_gyro = Adafruit_BNO055(sensorID);
+    m_curPoint = new sensors_event_t();
 }
 
 Gyro::~Gyro()
@@ -19,7 +20,7 @@ void Gyro::setup()
 	}
 	
 	m_gyro.setExtCrystalUse(true);
-	m_timer.start();
+	m_timer.restart();
 }
 
 void Gyro::loop()
@@ -41,7 +42,13 @@ int Gyro::size()
 
 void Gyro::record(sensors_event_t* point)
 {
-	if (size() > BUFFER_MAX)
+	if (size() >= BUFFER_MAX)
 		m_history.shift();
 	m_history.add(*point);
+#ifdef DEBUG
+    Serial.print("X: "); Serial.print(point->orientation.x);
+    Serial.print("\tY: "); Serial.print(point->orientation.y);
+    Serial.print("\tZ: "); Serial.println(point->orientation.z);
+    Serial.println(size());
+#endif // DEBUG
 }
