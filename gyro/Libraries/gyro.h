@@ -4,11 +4,11 @@
 #include <Arduino.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
-#include <LightChrono.h>
+#include <Chrono.h>
 
 #include "tracer.h"
 
-#define DEBUG
+//#define DEBUG
 
 const float RECORD_INTERVAL = 1000; // ms
 const int BUFFER_MAX = 100;
@@ -21,9 +21,26 @@ private:
     Tracer m_history;
     sensors_event_t* m_curPoint;
 	
-	LightChrono m_timer;
+	Chrono m_timer;
+    
+    Direction getDirection(sensors_event_t* event);
+    float deltaRotate(Direction direct, float past, float current);
 	
 public:
+    enum Axis
+    {
+        kXAxis,
+        kYAxis,
+        kZAxis
+    };
+    
+    enum Direction
+    {
+        kCW,
+        kCCW,
+        kNone
+    }
+
     Gyro(int sensorID);
     ~Gyro();
     
@@ -31,6 +48,7 @@ public:
     void loop();
     
     sensors_event_t* getCurrentEvent();
+    float lastDeltaAxis(float timeFrameMs, Axis axis);
     
     // History
     int size();

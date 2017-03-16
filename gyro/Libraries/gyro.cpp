@@ -11,6 +11,30 @@ Gyro::~Gyro()
     
 }
 
+Direction Gyro::getDirection(float accel)
+{
+    // idk if directions are right but this is a problematic solution in the first place
+    if (accel > 0) return Direction::kCW;
+    else if (accel < 0) return Direction::kCCW;
+    else return Direction::kNone; 
+}
+
+float Gyro::deltaRotate(Direction direct, float past, float current)
+{
+    switch (direct)
+    {
+    case Direction::CW:
+        // unfinished
+        break;
+    case Direction::CCW:
+        // unfinished
+        break;
+    default:
+        return 0;
+        break;
+    }
+}
+
 void Gyro::setup()
 {
     if (!m_gyro.begin())
@@ -33,6 +57,32 @@ void Gyro::loop()
 		record(m_curPoint);
 		m_timer.restart();
 	}
+}
+
+sensors_event_t* Gyro::getCurrentEvent()
+{
+    return m_curPoint;
+}
+
+float Gyro::lastDeltaAxis(float timeFrameMs, Axis axis)
+{
+    int intervals = timeFrameMs / RECORD_INTERVAL;
+    if (intervals >= size()) return 0;
+    sensors_event_t pastEvent = m_history.get(size() - intervals);
+    
+    switch (axis)
+    {
+    case Axis::kXAxis:
+        return m_curPoint.orientation.x - pastEvent.orientation.x;
+        break;
+    case Axis::kYAxis:
+        return pastEvent.orientation.y;
+        break;
+    case Axis::kZAxis:
+        return pastEvent.orientation.z;
+        break;
+    }
+    
 }
 
 int Gyro::size()

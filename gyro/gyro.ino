@@ -3,7 +3,7 @@
 
 Gyro gyro = Gyro(55);
 
-void setup(void) 
+void setup(void)
 {
   Serial.begin(9600);
   Serial.println("Orientation Sensor Test"); Serial.println("");
@@ -14,5 +14,8 @@ void setup(void)
 void loop(void)
 {
   gyro.loop();
+
+  gyro.lastDeltaAxis(3000, Gyro::Axis::kXAxis);
+  
   delay(100);
 }
