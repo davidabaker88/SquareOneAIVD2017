@@ -1,13 +1,29 @@
+#include <buffer.h>
+#include <crc.h>
+#include <datatypes.h>
+#include <local_datatypes.h>
+#include <printf.h>
+
+
+
+
 //Start Steering Includes
 //End Steering Includes
+
 //Start Drive Includes
+//THIS IS A LOCALLY DEFINED LIBRARY YOU IMPORT WITH THIS ARDUINO SCRIPT ON GITHUB NEEDED FOR (V)ESC CONTROL
+#include "./library/vesc/VescUart.h"
 //End Drive Includes
+
 //Start 9DoF Includes
 //End 9DoF Includes
+
 //Start GPS Includes
 //End GPS Includes
+
 //Start Magnetic Includes
 //End Magnetic Includes
+
 //Start shared Includes
 //End shared Includes
 
@@ -29,7 +45,7 @@
 enum TASK {
   none,//do nothing task
   one,
-  twe,
+  two,
   three,
   four,
   five,
@@ -41,9 +57,13 @@ enum TASK {
 TASK currentTask = none;
 //End shared Globals and Defines
 void setup() {
+  //Start Initilization
+  Serial.begin(115200);
+  //End Initialization
   //Start Steering Setup
   //End Steering Setup
   //Start Drive Setup
+  Serial1.begin(115200);
   //End Drive Setup
   //Start 9DoF Setup
   //End 9DoF Setup
@@ -57,6 +77,9 @@ void setup() {
 }
 
 void loop() {
+  if (currentTask == none){
+  setBrake();
+  }
   if (currentTask == one)
   {
     //start task 1 Code:  go forward X meters turn right.
@@ -98,3 +121,19 @@ void loop() {
     //end task8 Code
   }
 }
+
+//Call this function and give it a float to set the motor current at
+//Max RPM For testing currently hard coded in the VESC software is 2000 RPM
+//The motor will try to always get to 2000 RPM with a current you give it
+//You need more current to let the motor take more load to get it to higher speeds
+//The hardcoded max current is 10.0 MAX and -10.0 MIN (setting negative current values
+//will make the car go backwards.
+void setSpeed(float Current){
+  VescUartSetCurrent(Current);
+}
+
+void setBrake(){
+  VescUartSetCurrentBrake(0.0);
+}
+
+
