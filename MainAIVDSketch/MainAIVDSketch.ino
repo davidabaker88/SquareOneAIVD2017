@@ -1,11 +1,7 @@
-#include <buffer.h>
-#include <crc.h>
-#include <datatypes.h>
-#include <local_datatypes.h>
-#include <printf.h>
+#include <library.h>
 
-
-
+PID drivePID;
+double target = 0;
 
 //Start Steering Includes
 //End Steering Includes
@@ -135,5 +131,4 @@ void setSpeed(float Current){
 void setBrake(){
   VescUartSetCurrentBrake(0.0);
 }
-
 

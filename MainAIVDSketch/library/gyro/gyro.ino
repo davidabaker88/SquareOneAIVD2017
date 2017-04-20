@@ -13,9 +13,8 @@ void setup(void)
 
 void loop(void)
 {
+  pid.Compute();
   gyro.loop();
-
-  gyro.lastDeltaAxis(3000, Gyro::Axis::kXAxis);
   
   delay(100);
 }

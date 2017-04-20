@@ -19,7 +19,7 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 #ifndef _VESCUART_h
 #define _VESCUART_h
 
-//#include "Config.h" 
+//#include "examples/VescUartSample/Config.h" 
 
 /*TThis library was created on an Adruinio 2560 with different serial ports to have a better possibility
 to debug. The serial ports are define with #define:
