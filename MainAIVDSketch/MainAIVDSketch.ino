@@ -26,16 +26,30 @@
 
 //Start Steering Defines and Global Variables
 //End Steering Defines and Global Variables
+
 //Start Drive Defines and Global Variables
+//Call this function and give it a float to set the motor current at
+//Max RPM For testing currently hard coded in the VESC software is 2000 RPM
+//The motor will try to always get to 2000 RPM with a current you give it
+//You need more current to let the motor take more load to get it to higher speeds
+//The hardcoded max current is 10.0 MAX and -10.0 MIN (setting negative current values
+//will make the car go backwards.
+void setSpeed(float Current);
+void setBrake();
 //End Drive Defines and Global Variables
+
 //Start 9DoF Defines and Global Variables
 //End 9DoF Defines and Global Variables
+
 //Start GPS Defines and Global Variables
 //End GPS Defines and Global Variables
+
 //Start Magnetic Defines and Global Variables
 //End Magnetic Defines and Global Variables
+
 //Start Sensor Arduino Setup
 //End Sensor Arduino Setup
+
 //Start shared Globals and 
 enum TASK {
 	none,//do nothing task
@@ -51,15 +65,6 @@ enum TASK {
 
 TASK currentTask = none;
 //End shared Globals and Defines
-
-//Call this function and give it a float to set the motor current at
-//Max RPM For testing currently hard coded in the VESC software is 2000 RPM
-//The motor will try to always get to 2000 RPM with a current you give it
-//You need more current to let the motor take more load to get it to higher speeds
-//The hardcoded max current is 10.0 MAX and -10.0 MIN (setting negative current values
-//will make the car go backwards.
-void setSpeed(float Current);
-void setBrake();
 
 void setup() {
 	//Start Initilization
