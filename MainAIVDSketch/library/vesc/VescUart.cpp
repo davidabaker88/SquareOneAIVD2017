@@ -17,7 +17,6 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 
 #include <VescUart.h>
 #include "buffer.h"
-#include "crc.h"
 
 bool UnpackPayload(uint8_t* message, int lenMes, uint8_t* payload, int lenPa);
 bool ProcessReadPacket(uint8_t* message, bldcMeasure& values, int len);
