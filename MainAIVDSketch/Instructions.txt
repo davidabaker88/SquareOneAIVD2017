@@ -6,3 +6,5 @@ Chrono by Thomas O Fredericks
 LinkedList by Ivan Seidel
 PID by Brett Beauregard
 Servo by Michael Margolis, Arduino
+
+Move the "library" folder to C:/Users/[username]/Documents/Arduino/libraries
