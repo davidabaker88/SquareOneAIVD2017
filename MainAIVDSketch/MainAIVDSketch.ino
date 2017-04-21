@@ -52,6 +52,15 @@ void setBrake();
 //End Magnetic Defines and Global Variables
 
 //Start Sensor Arduino Setup
+const int SONIC_FRONT_PIN = 0;
+const int SONIC_RIGHT_PIN = 1;
+const int SONIC_BACK_PIN = 2;
+const int SONIC_LEFT_PIN = 3;
+const int SONIC_FRONT_RIGHT_PIN = 4;
+const int SONIC_BACK_RIGHT_PIN = 5;
+const int SONIC_BACK_LEFT_PIN = 6;
+const int SONIC_FRONT_LEFT_PIN = 7;
+
 //End Sensor Arduino Setup
 
 //Start shared Globals and 
