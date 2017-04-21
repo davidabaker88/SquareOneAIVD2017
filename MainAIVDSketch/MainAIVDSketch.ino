@@ -3,6 +3,7 @@
 #include <library.h>
 
 //Start Steering Includes
+#include <Servo.h>
 //End Steering Includes
 
 //Start Drive Includes
@@ -25,6 +26,9 @@
 //All Pins should be a define or const int.  And should be in All caps
 
 //Start Steering Defines and Global Variables
+const int STEERING_PIN = 9;
+Servo myservo;
+void steering(float degreeIn);
 //End Steering Defines and Global Variables
 
 //Start Drive Defines and Global Variables
@@ -71,6 +75,8 @@ void setup() {
 	Serial.begin(115200);
 	//End Initialization
 	//Start Steering Setup
+  Serial.begin(9600);
+  myservo.attach(STEERING_PIN);
 	//End Steering Setup
 	//Start Drive Setup
 	Serial1.begin(115200);
@@ -138,4 +144,14 @@ void setSpeed(float Current) {
 
 void setBrake() {
 	VescUartSetCurrentBrake(0.0);
+}
+
+void steering(float degreeIn) {
+  float degree = degreeIn;
+  degree += 90;
+  if (degree > 180) {
+    degree = 180;
+
+  myservo.write(degree);
+  Serial.write((int)degree);
 }
