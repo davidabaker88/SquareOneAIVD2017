@@ -1,0 +1,8 @@
+Dependencies:
+
+Adafruit BNO055 by Adafruit
+Adafruit Unified Sensors by Adafruit
+Chrono by Thomas O Fredericks
+LinkedList by Ivan Seidel
+PID by Brett Beauregard
+Servo by Michael Margolis, Arduino
