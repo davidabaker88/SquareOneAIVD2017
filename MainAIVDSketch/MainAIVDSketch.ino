@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <PID_v1.h>
-#include <library.h>
 
 //Start Steering Includes
 #include <Servo.h>
@@ -8,10 +7,11 @@
 
 //Start Drive Includes
 //THIS IS A LOCALLY DEFINED LIBRARY YOU IMPORT WITH THIS ARDUINO SCRIPT ON GITHUB NEEDED FOR (V)ESC CONTROL
-//#include "./library/vesc/VescUart.h"
+#include <VescUart.h>
 //End Drive Includes
 
 //Start 9DoF Includes
+#include <gyro.h>
 //End 9DoF Includes
 
 //Start GPS Includes
@@ -27,7 +27,7 @@
 
 //Start Steering Defines and Global Variables
 const int STEERING_PIN = 9;
-Servo myservo;
+Servo myServo;
 void steering(float degreeIn);
 //End Steering Defines and Global Variables
 
@@ -76,7 +76,7 @@ void setup() {
 	//End Initialization
 	//Start Steering Setup
   Serial.begin(9600);
-  myservo.attach(STEERING_PIN);
+  myServo.attach(STEERING_PIN);
 	//End Steering Setup
 	//Start Drive Setup
 	Serial1.begin(115200);
@@ -150,8 +150,8 @@ void steering(float degreeIn) {
   float degree = degreeIn;
   degree += 90;
   if (degree > 180) {
-    degree = 180;
-
-  myservo.write(degree);
+	  degree = 180;
+  }
+  myServo.write(degree);
   Serial.write((int)degree);
 }
