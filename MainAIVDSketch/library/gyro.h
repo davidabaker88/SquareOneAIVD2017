@@ -72,7 +72,8 @@ public:
     //        axis - axis to use values from
     float lastDeltaAxis(float timeFrameMs, Axis axis);
 
-    // Get the velocity/distance from a certain axis
+    // Get the orientation/velocity/distance from a certain axis
+    float getOrientation(Axis axis);
     float getVelocity(Axis axis);
     float getDistance(Axis axis);
 
@@ -133,5 +134,41 @@ public:
 //      Serial.print("Distance change since 500 ms ago: "); Serial.println(dist);
 //  }
 //
+// Controlling direction with PID
+//  Servo servo;
+//  Gyro gyro{ 55 };
+//  double in, out, sp;
+//  // PID values need to be tuned
+//  PID pid{ &in, &out, &sp, 1, 0, 0, DIRECT };
+//
+//  void steering(float degreeIn);
+//
+//  void setup() {
+//      gyro.setup();
+//      servo.attach(9);
+//
+//      // Maintain 0 degree heading
+//      sp = 0;
+//  }
+//
+//  void loop() {
+//      gyro.loop();
+//
+//      // Set 'in' to what we currently are at
+//      in = gyro.getOrientation(Gyro::kXAxis);
+//      pid.Compute();
+//      // Send PID output to steering
+//      steering(out);
+//  }
+//
+//  void steering(float degreeIn) {
+//      float degree = degreeIn;
+//      degree += 90;
+//      if (degree > 180) {
+//          degree = 180;
+//      }
+//      myServo.write(degree);
+//      Serial.write((int)degree);
+//  }
 
 #endif // GYRO_H

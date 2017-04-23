@@ -79,6 +79,21 @@ float Gyro::lastDeltaAxis(float timeFrameMs, Axis axis)
     }
 }
 
+float Gyro::getOrientation(Axis axis)
+{
+    switch (axis)
+    {
+    case kXAxis:
+        return m_curPoint->orientation.x;
+    case kYAxis:
+        return m_curPoint->orientation.y;
+    case kZAxis:
+        return m_curPoint->orientation.x;
+    default:
+        return 0;
+    }
+}
+
 float Gyro::getVelocity(Axis axis)
 {
     switch (axis)
