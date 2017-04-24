@@ -31,6 +31,9 @@ const double STEERING_P = 1.0;
 const double STEERING_I = 0;
 const double STEERING_D = 0;
 
+double in, out, sp;
+PID pid{ &in, &out, &sp, STEERING_P, STEERING_I, STEERING_D, DIRECT };
+
 Servo myServo;
 
 void steering(float degreeIn);
@@ -85,6 +88,21 @@ enum TASK {
 };
 
 TASK currentTask = none;
+
+//Task variables
+Chrono time;
+//task 1
+int t1Stage = 0;
+//task 2
+//task 3
+//task 4
+//task 5
+//task 5
+//task 6
+//task 7
+//task 8
+//End task variables
+
 //End shared Globals and Defines
 
 void setup() {
@@ -92,13 +110,13 @@ void setup() {
     Serial.begin(115200);
     //End Initialization
     //Start Steering Setup
-    Serial.begin(9600);
     myServo.attach(STEERING_PIN);
     //End Steering Setup
     //Start Drive Setup
     Serial1.begin(115200);
     //End Drive Setup
     //Start 9DoF Setup
+	gyro.setup();
     //End 9DoF Setup
     //Start GPS Setup
     //End GPS Setup
@@ -109,13 +127,59 @@ void setup() {
 
 }
 
+
 void loop() {
+
+	gyro.loop();
+	pid.Compute();
+	steering(out);
+
     if (currentTask == none) {
         setBrake();
     }
     if (currentTask == one)
     {
         //start task 1 Code:  go forward X meters turn right.
+		switch (t1Stage)
+		{
+		case 0:
+			time.restart();
+			t1Stage++;
+			break;
+		case 1:
+			if (time.hasPassed(5000))
+			{
+				setSpeed(5.0);
+				time.restart();
+				t1Stage++;
+			}
+			break;
+		case 2:
+			if (gyro.getDistanceFrom(time.elapsed(), Gyro::kXAxis) >= 3)
+			{
+				time.restart();
+				sp = 90;
+				in = gyro.getOrientation(Gyro::kXAxis);
+				t1Stage++;
+			}
+			break;
+		case 3:
+			if (in >= 89 && in <= 91)
+			{
+				time.restart();
+				t1Stage++;
+			}
+			break;
+		case 4:
+			if (gyro.getDistanceFrom(time.elapsed(), Gyro::kXAxis) >= 3)
+			{
+				setSpeed(0);
+				setBrake();
+				//done
+			}
+		default:
+			break;
+		}
         //end task1 Code
     }
     if (currentTask == two)
