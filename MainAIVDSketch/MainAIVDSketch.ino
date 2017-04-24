@@ -27,9 +27,9 @@
 
 //Start Steering Defines and Global Variables
 const int STEERING_PIN = 9;
-const int STEERING_P = 1.0;
-const int STEERING_I = 0;
-const int STEERING_D = 0;
+const double STEERING_P = 1.0;
+const double STEERING_I = 0;
+const double STEERING_D = 0;
 
 Servo myServo;
 
