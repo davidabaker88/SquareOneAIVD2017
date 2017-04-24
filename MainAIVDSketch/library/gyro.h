@@ -64,6 +64,8 @@ public:
     void setup();
     void loop();
 
+    void reset();
+
     // Get this iterations sensor event
     sensors_event_t* getCurrentEvent() { return m_curPoint; }
 
@@ -148,7 +150,7 @@ public:
 //      servo.attach(9);
 //
 //      // Maintain 0 degree heading
-//      sp = 0;
+//      sp = 90;
 //  }
 //
 //  void loop() {

@@ -62,6 +62,13 @@ void Gyro::loop()
     }
 }
 
+void Gyro::reset()
+{
+    m_history.clear();
+    setVelocity(0, 0, 0);
+    setDistance(0, 0, 0);
+}
+
 float Gyro::lastDeltaAxis(float timeFrameMs, Axis axis)
 {
     int intervals = timeFrameMs / RECORD_INTERVAL;
@@ -154,8 +161,8 @@ void Gyro::record(sensors_event_t* point)
         m_history.shift();
     m_history.add(*point);
 #ifdef DEBUG
-    Serial.print("X: "); Serial.print(point->orientation.x);
-    Serial.print("\tY: "); Serial.print(point->orientation.y);
-    Serial.print("\tZ: "); Serial.println(point->orientation.z);
+    Serial.print("X: "); Serial.print(point->acceleration.x);
+    Serial.print("\tY: "); Serial.print(point->acceleration.y);
+    Serial.print("\tZ: "); Serial.println(point->acceleration.z);
 #endif // DEBUG
 }
