@@ -18,11 +18,6 @@ public:
 	{
 		return &root->data;
 	}
-
-	ListNode<sensors_event_t> publicGetNode(int index)
-	{
-		return *getNode(index);
-	}
 };
 
 #endif // LIST_H
