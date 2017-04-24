@@ -48,6 +48,9 @@ void setBrake();
 //End Drive Defines and Global Variables
 
 //Start 9DoF Defines and Global Variables
+const int GYRO_SENSOR_ID = 55;
+
+Gyro gyro{ GYRO_SENSOR_ID };
 //End 9DoF Defines and Global Variables
 
 //Start GPS Defines and Global Variables
@@ -70,101 +73,101 @@ const int SONIC_FRONT_LEFT_PIN = 7;
 
 //Start shared Globals and 
 enum TASK {
-	none,//do nothing task
-	one,
-	two,
-	three,
-	four,
-	five,
-	six,
-	seven,
-	eight
+    none,//do nothing task
+    one,
+    two,
+    three,
+    four,
+    five,
+    six,
+    seven,
+    eight
 };
 
 TASK currentTask = none;
 //End shared Globals and Defines
 
 void setup() {
-	//Start Initilization
-	Serial.begin(115200);
-	//End Initialization
-	//Start Steering Setup
-  Serial.begin(9600);
-  myServo.attach(STEERING_PIN);
-	//End Steering Setup
-	//Start Drive Setup
-	Serial1.begin(115200);
-	//End Drive Setup
-	//Start 9DoF Setup
-	//End 9DoF Setup
-	//Start GPS Setup
-	//End GPS Setup
-	//Start Magnetic Setup
-	//End Magnetic Setup
-	//Start Sensor Arduino Setup
-	//End Sensor Arduino Setup
+    //Start Initilization
+    Serial.begin(115200);
+    //End Initialization
+    //Start Steering Setup
+    Serial.begin(9600);
+    myServo.attach(STEERING_PIN);
+    //End Steering Setup
+    //Start Drive Setup
+    Serial1.begin(115200);
+    //End Drive Setup
+    //Start 9DoF Setup
+    //End 9DoF Setup
+    //Start GPS Setup
+    //End GPS Setup
+    //Start Magnetic Setup
+    //End Magnetic Setup
+    //Start Sensor Arduino Setup
+    //End Sensor Arduino Setup
 
 }
 
 void loop() {
-	if (currentTask == none) {
-		setBrake();
-	}
-	if (currentTask == one)
-	{
-		//start task 1 Code:  go forward X meters turn right.
-		//end task1 Code
-	}
-	if (currentTask == two)
-	{
-		//start task 2 Code:  go forward X meters if obstacle, stop.
-		//end task2 Code
-	}
-	if (currentTask == three)
-	{
-		//start task 3 Code:  go forward X meters turn right.
-		//end task3 Code
-	}
-	if (currentTask == four)
-	{
-		//start task 4 Code:  navagate fixed course.
-		//end task4 Code
-	}
-	if (currentTask == five)
-	{
-		//start task 5 Code:  avoid obstacles/relatively straight.
-		//end task5 Code
-	}
-	if (currentTask == six)
-	{
-		//start task 6 Code:  Parallel park.
-		//end task6 Code
-	}
-	if (currentTask == seven)
-	{
-		//start task 7 Code:  traffic light.
-		//end task7 Code
-	}
-	if (currentTask == eight)
-	{
-		//start task 8 Code:  gps navagation.
-		//end task8 Code
-	}
+    if (currentTask == none) {
+        setBrake();
+    }
+    if (currentTask == one)
+    {
+        //start task 1 Code:  go forward X meters turn right.
+        //end task1 Code
+    }
+    if (currentTask == two)
+    {
+        //start task 2 Code:  go forward X meters if obstacle, stop.
+        //end task2 Code
+    }
+    if (currentTask == three)
+    {
+        //start task 3 Code:  go forward X meters turn right.
+        //end task3 Code
+    }
+    if (currentTask == four)
+    {
+        //start task 4 Code:  navagate fixed course.
+        //end task4 Code
+    }
+    if (currentTask == five)
+    {
+        //start task 5 Code:  avoid obstacles/relatively straight.
+        //end task5 Code
+    }
+    if (currentTask == six)
+    {
+        //start task 6 Code:  Parallel park.
+        //end task6 Code
+    }
+    if (currentTask == seven)
+    {
+        //start task 7 Code:  traffic light.
+        //end task7 Code
+    }
+    if (currentTask == eight)
+    {
+        //start task 8 Code:  gps navagation.
+        //end task8 Code
+    }
 }
 
 void setSpeed(float Current) {
-	VescUartSetCurrent(Current);
+    VescUartSetCurrent(Current);
 }
 
 void setBrake() {
-	VescUartSetCurrentBrake(0.0);
+    VescUartSetCurrentBrake(0.0);
 }
 
 void steering(float degreeIn) {
   float degree = degreeIn;
   degree += 90;
   if (degree > 180) {
-	  degree = 180;
+      degree = 180;
   }
   myServo.write(degree);
   Serial.write((int)degree);

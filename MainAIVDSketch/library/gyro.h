@@ -18,7 +18,8 @@ const float COORD_LAT = 42.300688;
 const float COORD_LONG = 83.698129;
 const float COORD_DECL = 6.53; // +- .37 // 7.04 Mcity
 
-
+// Summary:
+// Wrapper/Manager for the Adafruit BNO055 9DoF sensor
 class Gyro
 {
 public:
@@ -28,122 +29,146 @@ public:
         kYAxis,
         kZAxis
     };
-    
+
     enum Direction
     {
         kCW,
         kCCW,
         kNone
     };
-    
+
 private:
     Adafruit_BNO055 m_gyro;
-    
+
     Tracer m_history;
     sensors_event_t* m_curPoint;
-	
-	Chrono m_timer;
-    
-    Direction getDirection(float accel)
-    {
-        // idk if directions are right but this is a problematic solution in the first place
-        if (accel > 0) return Direction::kCW;
-        else if (accel < 0) return Direction::kCCW;
-        else return Direction::kNone; 
-    }
-    
-    float deltaRotate(Direction direct, float past, float current)
-    {
-        switch (direct)
-        {
-        case Direction::kCW:
-            // unfinished
-            break;
-        case Direction::kCCW:
-            // unfinished
-            break;
-        default:
-            return 0;
-            break;
-        }
-    }
-	
+    sensors_vec_t m_velocity;
+    sensors_vec_t m_distance;
+
+    Chrono m_timer;
+
+    // Find the current direction of the gyro is rotating from the change in rotation
+    // Takes: dRot - change in rotation
+    Direction getDirection(float dRot);
+
+    // Sets the Velocity/Distance vectors
+    void setVelocity(float x, float y, float z);
+    void setDistance(float x, float y, float z);
+
 public:
-    Gyro(int sensorID)
-    {
-        m_gyro = Adafruit_BNO055(sensorID);
-        m_curPoint = new sensors_event_t();
-    }
-    
-    ~Gyro()
-    {
-    }
-    
-    void setup()
-    {
-        if (!m_gyro.begin())
-        {
-            Serial.print("Gyro (BNO055) not detected");
-            while (1);
-        }
-        
-        m_gyro.setExtCrystalUse(true);
-        m_timer.restart();
-    }
-    
-    void loop()
-    {
-        m_gyro.getEvent(m_curPoint);
-        
-        // Record current event if timer has passed
-        if (m_timer.hasPassed(RECORD_INTERVAL))
-        {
-            record(m_curPoint);
-            m_timer.restart();
-        }
-    }
-    
+    // Constructs with sensorID which is 55
+    Gyro(int sensorID);
+    ~Gyro();
+
+    // Methods to be called in the respective functions in the main arduino ino
+    void setup();
+    void loop();
+
+    // Get this iterations sensor event
     sensors_event_t* getCurrentEvent() { return m_curPoint; }
-    
-    float lastDeltaAxis(float timeFrameMs, Axis axis)
-    {
-        int intervals = timeFrameMs / RECORD_INTERVAL;
-        if (intervals >= size()) return 0;
-        sensors_event_t pastEvent = m_history.get(size() - intervals);
-        
-        switch (axis)
-        {
-        case Axis::kXAxis:
-            return m_curPoint->orientation.x - pastEvent.orientation.x;
-            break;
-        case Axis::kYAxis:
-            return pastEvent.orientation.y;
-            break;
-        case Axis::kZAxis:
-            return pastEvent.orientation.z;
-            break;
-        }
-    }
-    
-    float getHeading(float lat, float lon)
-    {
-        return atan2(m_curPoint->magnetic.y, m_curPoint->magnetic.x) * (180 / 3.14159) + COORD_DECL; // STUPID and probably doesn't work
-    }
-    
+
+    // Get the change in an axis in the time frame
+    // Takes: timeFrameMs - time from now in ms to compare with now
+    //        axis - axis to use values from
+    float lastDeltaAxis(float timeFrameMs, Axis axis);
+
+    // Get the orientation/velocity/distance from a certain axis
+    float getOrientation(Axis axis);
+    float getVelocity(Axis axis);
+    float getDistance(Axis axis);
+
+    // Get the distance in meters from an axis in a time frame
+    // Takes: timeFrameMs - time from now in ms to compare with now
+    //        axis - axis to use values from
+    // WARNING: This calculation's distance is relative to the list
+    //      so it forgets distances from points that were deleted
+    float getDistanceFrom(float timeFrameMs, Axis axis);
+
+    // Gets the heading in degrees from true north
+    // Takes: lat - current latitudinal coordinate
+    //        lon - current longitudinal coordinate
+    float getHeading(float lat, float lon);
+
     // History
+    // Gets the current size of the history list
     int size() { return m_history.size(); }
-    
-    void record(sensors_event_t* point)
-    {
-        if (size() >= BUFFER_MAX)
-            m_history.shift();
-        m_history.add(*point);
-#ifdef DEBUG
-        Serial.print("X: "); Serial.print(point->orientation.x);
-        Serial.print("\tY: "); Serial.print(point->orientation.y);
-        Serial.print("\tZ: "); Serial.println(point->orientation.z);
-#endif // DEBUG
-    }
+
+    // Record a point in the list
+    void record(sensors_event_t* point);
 };
+
+// EXAMPLES -------------------------------------------------------------------
+// Change in rotation:
+//  Gyro gyro = Gyro(55);
+//  float timeFrame = 500; // ms
+//  Gyro::Axis axis = Gyro::kXAxis;
+//
+//  void setup() {
+//      Serial.begin(9600);
+//      gyro.setup();
+//  }
+//
+//  void loop() {
+//      gyro.loop();
+//
+//      Serial.print("dRotation: ");
+//      // This will return 0 until 500 ms has passed
+//      Serial.println(gyro.lastDeltaAxis(timeFrame, axis));
+//  }
+//
+// Distance from a time period:
+//  Gyro gyro = Gyro(55);
+//  float timeFrame = 500; // ms
+//  Gyro::Axis axis = Gyro::kXAxis;
+//
+//  void setup() {
+//      Serial.begin(9600);
+//
+//      gyro.setup();
+//  }
+//
+//  void loop() {
+//      gyro.loop();
+//
+//      float dist = gyro.getDistanceFrom(timeFrame, axis);
+//      Serial.print("Distance change since 500 ms ago: "); Serial.println(dist);
+//  }
+//
+// Controlling direction with PID
+//  Servo servo;
+//  Gyro gyro{ 55 };
+//  double in, out, sp;
+//  // PID values need to be tuned
+//  PID pid{ &in, &out, &sp, 1, 0, 0, DIRECT };
+//
+//  void steering(float degreeIn);
+//
+//  void setup() {
+//      gyro.setup();
+//      servo.attach(9);
+//
+//      // Maintain 0 degree heading
+//      sp = 0;
+//  }
+//
+//  void loop() {
+//      gyro.loop();
+//
+//      // Set 'in' to what we currently are at
+//      in = gyro.getOrientation(Gyro::kXAxis);
+//      pid.Compute();
+//      // Send PID output to steering
+//      steering(out);
+//  }
+//
+//  void steering(float degreeIn) {
+//      float degree = degreeIn;
+//      degree += 90;
+//      if (degree > 180) {
+//          degree = 180;
+//      }
+//      myServo.write(degree);
+//      Serial.write((int)degree);
+//  }
 
 #endif // GYRO_H
