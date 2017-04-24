@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding ="utf-8" ?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" >
-  <PropertyGroup Label="Globals" >
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
     <ItemsProjectGuid>{46d00589-cca6-45f5-a80f-0043b80504a5}</ItemsProjectGuid>
@@ -15,26 +15,28 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)buffer.cpp" />
-<ClCompile Include="$(MSBuildThisFileDirectory)crc.cpp" />
-<ClCompile Include="$(MSBuildThisFileDirectory)VescUart.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)crc.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)VescUart.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)buffer.h" />
-<ClInclude Include="$(MSBuildThisFileDirectory)command.h" />
-<ClInclude Include="$(MSBuildThisFileDirectory)crc.h" />
-<ClInclude Include="$(MSBuildThisFileDirectory)datatypes.h" />
-<ClInclude Include="$(MSBuildThisFileDirectory)encoder_driver.h" />
-<ClInclude Include="$(MSBuildThisFileDirectory)gyro.h" />
-<ClInclude Include="$(MSBuildThisFileDirectory)library.h" />
-<ClInclude Include="$(MSBuildThisFileDirectory)local_datatypes.h" />
-<ClInclude Include="$(MSBuildThisFileDirectory)tracer.h" />
-<ClInclude Include="$(MSBuildThisFileDirectory)VescUart.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)command.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)crc.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)datatypes.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)dGPS.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)encoder_driver.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)gyro.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)library.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)local_datatypes.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)tracer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)VescUart.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="$(MSBuildThisFileDirectory)encoder_driver.ino" />
-<Text Include="$(MSBuildThisFileDirectory)gyro.ino" />
+    <Text Include="$(MSBuildThisFileDirectory)gyro.ino" />
   </ItemGroup>
   <ItemGroup>
-    
+    <None Include="$(MSBuildThisFileDirectory)dGPS.cpp.ino" />
+    <None Include="$(MSBuildThisFileDirectory)GPS.ino" />
   </ItemGroup>
 </Project>
