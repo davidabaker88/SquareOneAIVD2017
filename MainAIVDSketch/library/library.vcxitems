@@ -16,6 +16,7 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)buffer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)crc.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)gyro.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)VescUart.cpp" />
   </ItemGroup>
   <ItemGroup>
