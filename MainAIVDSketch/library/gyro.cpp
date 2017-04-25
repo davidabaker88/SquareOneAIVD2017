@@ -40,7 +40,7 @@ void Gyro::setup()
         while (1);
     }
 
-    int sys, g, a, m;
+    uint8_t sys, g, a, m;
     while (!sys)
     {
         m_gyro.getCalibration(&sys, &g, &a, &m);
@@ -53,8 +53,10 @@ void Gyro::setup()
 void Gyro::loop()
 {
     m_gyro.getEvent(m_curPoint);
-    m_curPoint->magnetic = m_gyro.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-    m_curPoint->acceleration = m_gyro.getVector(Adafruit_BNO055::VECTOR_ACCLEROMETER)
+    imu::Vector<3> vec = m_gyro.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+    m_curPoint->magnetic.x = vec[0]; m_curPoint->magnetic.y = vec[1]; m_curPoint->magnetic.z = vec[2];
+    vec = m_gyro.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    m_curPoint->acceleration.x = vec[0]; m_curPoint->acceleration.y = vec[1]; m_curPoint->acceleration.z = vec[2];
 
     // Record current event if timer has passed
     if (m_timer.hasPassed(RECORD_INTERVAL))
