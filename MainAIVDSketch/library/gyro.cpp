@@ -40,6 +40,12 @@ void Gyro::setup()
         while (1);
     }
 
+    int sys, g, a, m;
+    while (!sys)
+    {
+        m_gyro.getCalibration(&sys, &g, &a, &m);
+    }
+
     m_gyro.setExtCrystalUse(true);
     m_timer.restart();
 }
@@ -47,6 +53,8 @@ void Gyro::setup()
 void Gyro::loop()
 {
     m_gyro.getEvent(m_curPoint);
+    m_curPoint->magnetic = m_gyro.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+    m_curPoint->acceleration = m_gyro.getVector(Adafruit_BNO055::VECTOR_ACCLEROMETER)
 
     // Record current event if timer has passed
     if (m_timer.hasPassed(RECORD_INTERVAL))

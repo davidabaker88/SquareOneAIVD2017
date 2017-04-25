@@ -11,7 +11,7 @@
 
 #define DEBUG
 
-const float RECORD_INTERVAL = 1000; // ms
+const float RECORD_INTERVAL = 500; // ms
 const int BUFFER_MAX = 100;
 
 const float COORD_LAT = 42.300688;

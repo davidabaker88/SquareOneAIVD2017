@@ -116,7 +116,7 @@ void setup() {
     Serial1.begin(115200);
     //End Drive Setup
     //Start 9DoF Setup
-	gyro.setup();
+    gyro.setup();
     //End 9DoF Setup
     //Start GPS Setup
     //End GPS Setup
@@ -130,9 +130,9 @@ void setup() {
 
 void loop() {
 
-	gyro.loop();
-	pid.Compute();
-	steering(out);
+    gyro.loop();
+    pid.Compute();
+    steering(out);
 
     if (currentTask == none) {
         setBrake();
@@ -140,46 +140,46 @@ void loop() {
     if (currentTask == one)
     {
         //start task 1 Code:  go forward X meters turn right.
-		switch (t1Stage)
-		{
-		case 0:
-			time.restart();
-			t1Stage++;
-			break;
-		case 1:
-			if (time.hasPassed(5000))
-			{
-				setSpeed(5.0);
-				time.restart();
-				t1Stage++;
-			}
-			break;
-		case 2:
-			if (gyro.getDistanceFrom(time.elapsed(), Gyro::kXAxis) >= 3)
-			{
-				time.restart();
-				sp = 90;
-				in = gyro.getOrientation(Gyro::kXAxis);
-				t1Stage++;
-			}
-			break;
-		case 3:
-			if (in >= 89 && in <= 91)
-			{
-				time.restart();
-				t1Stage++;
-			}
-			break;
-		case 4:
-			if (gyro.getDistanceFrom(time.elapsed(), Gyro::kXAxis) >= 3)
-			{
-				setSpeed(0);
-				setBrake();
-				//done
-			}
-		default:
-			break;
-		}
+        switch (t1Stage)
+        {
+        case 0:
+            time.restart();
+            t1Stage++;
+            break;
+        case 1:
+            if (time.hasPassed(5000))
+            {
+                setSpeed(5.0);
+                time.restart();
+                t1Stage++;
+            }
+            break;
+        case 2:
+            if (gyro.getDistanceFrom(time.elapsed(), Gyro::kXAxis) >= 3)
+            {
+                time.restart();
+                sp = 90;
+                in = gyro.getOrientation(Gyro::kXAxis);
+                t1Stage++;
+            }
+            break;
+        case 3:
+            if (in >= 89 && in <= 91)
+            {
+                time.restart();
+                t1Stage++;
+            }
+            break;
+        case 4:
+            if (gyro.getDistanceFrom(time.elapsed(), Gyro::kXAxis) >= 3)
+            {
+                setSpeed(0);
+                setBrake();
+                //done
+            }
+        default:
+            break;
+        }
         //end task1 Code
     }
     if (currentTask == two)
