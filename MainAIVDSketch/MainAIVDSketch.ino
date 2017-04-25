@@ -15,6 +15,7 @@
 //End 9DoF Includes
 
 //Start GPS Includes
+#include <dGPS.h>
 //End GPS Includes
 
 //Start Magnetic Includes
@@ -57,6 +58,7 @@ Gyro gyro{ GYRO_SENSOR_ID };
 //End 9DoF Defines and Global Variables
 
 //Start GPS Defines and Global Variables
+dGPS gps;
 //End GPS Defines and Global Variables
 
 //Start Magnetic Defines and Global Variables
@@ -92,14 +94,20 @@ TASK currentTask = none;
 //Task variables
 Chrono time;
 //task 1
-int t1Stage = 0;
+int t1Stage;
 //task 2
+int t2Stage;
 //task 3
 //task 4
 //task 5
 //task 5
 //task 6
 //task 7
+const float lat[] = { 0, 0 };
+const float lon[] = { 0, 0 };
+
+int t7Stage;
+int destStage;
 //task 8
 //End task variables
 
@@ -119,6 +127,7 @@ void setup() {
     gyro.setup();
     //End 9DoF Setup
     //Start GPS Setup
+	gps.init();
     //End GPS Setup
     //Start Magnetic Setup
     //End Magnetic Setup
@@ -131,11 +140,12 @@ void setup() {
 void loop() {
 
     gyro.loop();
+	in = gyro.getOrientation(Gyro::kXAxis);
     pid.Compute();
     steering(out);
 
     if (currentTask == none) {
-        setBrake();
+        //setBrake();
     }
     if (currentTask == one)
     {
@@ -159,7 +169,6 @@ void loop() {
             {
                 time.restart();
                 sp = 90;
-                in = gyro.getOrientation(Gyro::kXAxis);
                 t1Stage++;
             }
             break;
@@ -174,47 +183,107 @@ void loop() {
             if (gyro.getDistanceFrom(time.elapsed(), Gyro::kXAxis) >= 3)
             {
                 setSpeed(0);
-                setBrake();
+				t1Stage++;
+
                 //done
             }
-        default:
-            break;
         }
         //end task1 Code
     }
     if (currentTask == two)
     {
         //start task 2 Code:  go forward X meters if obstacle, stop.
+		switch (t2Stage)
+		{
+		case 0:
+			time.restart();
+			setSpeed(5.0);
+			t2Stage++;
+			break;
+		case 1:
+			if (SONIC_FRONT_PIN == 1)
+			{
+				setSpeed(0);
+			}
+			else if (gyro.getDistanceFrom(time.elapsed(), Gyro::kXAxis) >= 11)
+			{
+				setSpeed(0);
+				t2Stage++;
+
+				//done
+			}
+			else 
+			{
+				setSpeed(5);
+			}
+			break;
+		}
         //end task2 Code
     }
     if (currentTask == three)
     {
-        //start task 3 Code:  go forward X meters turn right.
+        //start task 3 Code:  navagate fixed course.
         //end task3 Code
     }
     if (currentTask == four)
     {
-        //start task 4 Code:  navagate fixed course.
+        //start task 4 Code:  avoid obstacles/relatively straight.
         //end task4 Code
     }
     if (currentTask == five)
     {
-        //start task 5 Code:  avoid obstacles/relatively straight.
+        //start task 5 Code:  Parallel park.
         //end task5 Code
     }
     if (currentTask == six)
     {
-        //start task 6 Code:  Parallel park.
+        //start task 6 Code:  traffic light.
         //end task6 Code
     }
     if (currentTask == seven)
     {
-        //start task 7 Code:  traffic light.
+        //start task 7 Code:  gps navagation.
+		gps.update(lat[destStage], lon[destStage]);
+
+		switch (t7Stage)
+		{
+		case 0: // navigating
+			//assuming pointing north
+			setSpeed(5);
+			sp = gps.angleToPoint();
+
+			if (gps.Dist() <= 0.5)
+			{
+				setSpeed(0);
+				time.restart();
+				t7Stage++;
+			}
+
+			break;
+		case 1: 
+			
+			// blinking light or something
+
+			if (time.elapsed() < 10000) // wait 10 seconds
+				if (destStage + 1 < sizeof(lat) / sizeof(lat[0]) && destStage + 1 < sizeof(lon) / sizeof(lon[0])) // size of array
+				{
+					t7Stage = 0;
+					destStage++;
+				}
+				else
+				{
+					t7Stage++;
+					destStage = 0;
+				}
+
+			break;
+		}
+
         //end task7 Code
     }
     if (currentTask == eight)
     {
-        //start task 8 Code:  gps navagation.
+        //start task 8 Code:  Platoon?
         //end task8 Code
     }
 }
