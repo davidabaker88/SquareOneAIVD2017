@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <PID_v1.h>
+#include <math.h>
 
 //Start Steering Includes
 #include <Servo.h>
@@ -74,6 +75,16 @@ const int SONIC_BACK_RIGHT_PIN = 5;
 const int SONIC_BACK_LEFT_PIN = 6;
 const int SONIC_FRONT_LEFT_PIN = 7;
 
+const int IR_FRONT_RIGHT_PIN[] = { 0 };
+const int IR_FRONT_LEFT_PIN[] = { 0 };
+const int IR_A_PILLAR_LEFT_PIN[] = { 0 };
+const int IR_A_CORNER_LEFT_PIN[] = { 0 };
+const int IR_A_BACK_LEFT_PIN[] = { 0 };
+const int IR_A_BACK_RIGHT_PIN[] = { 0 };
+const int IR_A_CORNER_RIGHT_PIN[] = { 0 };
+const int IR_A_PILLAR_RIGHT_PIN[] = { 0 };
+
+int IRDistance(int pins[], int length = -1);
 //End Sensor Arduino Setup
 
 //Start shared Globals and 
@@ -99,6 +110,8 @@ int t1Stage;
 int t2Stage;
 //task 3
 //task 4
+int t4Stage;
+int preTurnSp;
 //task 5
 //task 5
 //task 6
@@ -201,7 +214,7 @@ void loop() {
 			t2Stage++;
 			break;
 		case 1:
-			if (SONIC_FRONT_PIN == 1)
+			if (digitalRead(SONIC_FRONT_PIN) == 1)
 			{
 				setSpeed(0);
 			}
@@ -228,6 +241,38 @@ void loop() {
     if (currentTask == four)
     {
         //start task 4 Code:  avoid obstacles/relatively straight.
+
+		switch (t4Stage)
+		{
+		case 0:
+			setSpeed(5);
+			preTurnSp = sp;
+
+			if (!!IRDistance(IR_FRONT_LEFT_PIN))
+			{
+				sp += 90;
+				t4Stage++;
+			}
+			else if (!!IRDistance(IR_FRONT_RIGHT_PIN))
+			{
+				sp -= 90;
+				t4Stage += 2;
+			}
+			break;
+
+		case 1: // turned right
+			if (in >= fmod(preTurnSp + 89, 360) && in <= fmod(preTurnSp + 91, 360))
+			{
+
+			}
+
+			break;
+
+		case 2: //turned left
+
+			break;
+		}
+
         //end task4 Code
     }
     if (currentTask == five)
@@ -286,6 +331,11 @@ void loop() {
         //start task 8 Code:  Platoon?
         //end task8 Code
     }
+
+	if (sp < 0)
+		sp += 360;
+
+	sp = fmod(sp, 360);
 }
 
 void setSpeed(float Current) {
@@ -304,4 +354,18 @@ void steering(float degreeIn) {
   }
   myServo.write(degree);
   //Serial.write((int)degree);
+}
+
+//Takes IR pins from least to most and converts into distance (cm)
+int IRDistance(const int pins[], int length = -1)
+{
+	if (length == -1)
+		length = sizeof(pins) / sizeof(pins[0]);
+
+	int num;
+	for (int i = 0; i < length; i++)
+		if (digitalRead(pins[i]) == 1)
+			num += pow(2, i);
+
+	return (int)(num * (150.0 / pow(2, length)));
 }
