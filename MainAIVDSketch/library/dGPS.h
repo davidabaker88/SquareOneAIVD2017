@@ -2,10 +2,12 @@
 #include "pins_arduino.h"
 //#include "WProgram.h"
 #include "Arduino.h"
-#include "math.h"
+#include <math.h>
 
 #ifndef dGPS_h
 #define dGPS_h
+
+typedef bool boolean;
 
 class dGPS
 {
@@ -35,6 +37,8 @@ class dGPS
                 float angleToPoint();
                 
   private:
+    float desLat, desLon;
+  
     // int _pin;
     char linea[300];
     //int _rxPin;

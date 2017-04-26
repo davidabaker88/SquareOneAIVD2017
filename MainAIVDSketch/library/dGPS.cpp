@@ -2,7 +2,7 @@
 #include "SoftwareSerial.h"
 #include "pins_arduino.h"
 //#include "WProgram.h"
-#include "Arduino.h"
+#include <Arduino.h>
 #include "math.h"
 #define MAX_STRING_LEN  300
 
@@ -171,8 +171,10 @@ float dGPS::getdestcoord() {
 }
 
 // update all the fields from the incoming $GPRMC string
-boolean dGPS::update(float desLat, float desLon)
+boolean dGPS::update(float desLat_, float desLon_)
 {
+  this->desLat = desLat_;
+  this->desLon = desLon_;
   while (true) {
     int byteGPS = -1;
     byteGPS = gpsSerial.read();    //read a byte from the serial port
