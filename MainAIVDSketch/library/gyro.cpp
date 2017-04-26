@@ -34,16 +34,17 @@ void Gyro::setDistance(float x, float y, float z)
 
 void Gyro::setup()
 {
-    if (!m_gyro.begin(Adafruit_BNO055::OPERATION_MODE_AMG))
+    if (!m_gyro.begin(Adafruit_BNO055::OPERATION_MODE_NDOF))
     {
         Serial.print("Gyro (BNO055) not detected");
         while (1);
     }
 
     uint8_t sys, g, a, m;
-    while (!sys)
+    while (!m_gyro.isFullyCalibrated())
     {
         m_gyro.getCalibration(&sys, &g, &a, &m);
+        Serial.print(sys); Serial.print(g); Serial.print(a); Serial.println(m);
     }
 
     m_gyro.setExtCrystalUse(true);
@@ -55,7 +56,7 @@ void Gyro::loop()
     m_gyro.getEvent(m_curPoint);
     imu::Vector<3> vec = m_gyro.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
     m_curPoint->magnetic.x = vec[0]; m_curPoint->magnetic.y = vec[1]; m_curPoint->magnetic.z = vec[2];
-    vec = m_gyro.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    vec = m_gyro.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
     m_curPoint->acceleration.x = vec[0]; m_curPoint->acceleration.y = vec[1]; m_curPoint->acceleration.z = vec[2];
 
     // Record current event if timer has passed
@@ -171,8 +172,8 @@ void Gyro::record(sensors_event_t* point)
         m_history.shift();
     m_history.add(*point);
 #ifdef DEBUG
-    Serial.print("X: "); Serial.print(point->acceleration.x);
-    Serial.print("\tY: "); Serial.print(point->acceleration.y);
-    Serial.print("\tZ: "); Serial.println(point->acceleration.z);
+    Serial.print("X: "); Serial.print(getOrientation(kXAxis));
+    Serial.print("\tY: "); Serial.print(getOrientation(kYAxis));
+    Serial.print("\tZ: "); Serial.println(getOrientation(kZAxis));
 #endif // DEBUG
 }

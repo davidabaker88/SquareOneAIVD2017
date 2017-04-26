@@ -140,7 +140,7 @@ void setup() {
 void loop() {
 
     gyro.loop();
-	in = gyro.getOrientation(Gyro::kXAxis);
+	  in = gyro.getOrientation(Gyro::kXAxis);
     pid.Compute();
     steering(out);
 
@@ -170,8 +170,8 @@ void loop() {
                 time.restart();
                 sp = 90;
                 t1Stage++;
-            }
             break;
+            }
         case 3:
             if (in >= 89 && in <= 91)
             {
@@ -303,5 +303,5 @@ void steering(float degreeIn) {
       degree = 180;
   }
   myServo.write(degree);
-  Serial.write((int)degree);
+  //Serial.write((int)degree);
 }
