@@ -34,7 +34,7 @@ void Gyro::setDistance(float x, float y, float z)
 
 void Gyro::setup()
 {
-    if (!m_gyro.begin())
+    if (!m_gyro.begin(Adafruit_BNO055::OPERATION_MODE_AMG))
     {
         Serial.print("Gyro (BNO055) not detected");
         while (1);
