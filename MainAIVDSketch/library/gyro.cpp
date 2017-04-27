@@ -28,8 +28,8 @@ void Gyro::setVelocity(float x, float y, float z)
 void Gyro::setDistance(float x, float y, float z)
 {
     m_distance.x += x;
-    m_distance.y += x;
-    m_distance.z += x;
+    m_distance.y += y;
+    m_distance.z += z;
 }
 
 void Gyro::setup()
@@ -41,7 +41,7 @@ void Gyro::setup()
     }
 
     uint8_t sys, g, a, m;
-    while (!m_gyro.isFullyCalibrated())
+    while (!sys/*!m_gyro.isFullyCalibrated()*/)
     {
         m_gyro.getCalibration(&sys, &g, &a, &m);
         Serial.print(sys); Serial.print(g); Serial.print(a); Serial.println(m);
@@ -54,10 +54,10 @@ void Gyro::setup()
 void Gyro::loop()
 {
     m_gyro.getEvent(m_curPoint);
-    imu::Vector<3> vec = m_gyro.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-    m_curPoint->magnetic.x = vec[0]; m_curPoint->magnetic.y = vec[1]; m_curPoint->magnetic.z = vec[2];
-    vec = m_gyro.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-    m_curPoint->acceleration.x = vec[0]; m_curPoint->acceleration.y = vec[1]; m_curPoint->acceleration.z = vec[2];
+    //imu::Vector<3> vec = m_gyro.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+    //m_curPoint->magnetic.x = vec[0]; m_curPoint->magnetic.y = vec[1]; m_curPoint->magnetic.z = vec[2];
+    //vec = m_gyro.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+    //m_curPoint->acceleration.x = vec[0]; m_curPoint->acceleration.y = vec[1]; m_curPoint->acceleration.z = vec[2];
 
     // Record current event if timer has passed
     if (m_timer.hasPassed(RECORD_INTERVAL))
@@ -106,7 +106,7 @@ float Gyro::getOrientation(Axis axis)
     case kYAxis:
         return m_curPoint->orientation.y;
     case kZAxis:
-        return m_curPoint->orientation.x;
+        return m_curPoint->orientation.z;
     default:
         return 0;
     }
@@ -172,7 +172,7 @@ void Gyro::record(sensors_event_t* point)
         m_history.shift();
     m_history.add(*point);
 #ifdef DEBUG
-    Serial.print("X: "); Serial.print(getOrientation(kXAxis));
+    Serial.print("Gyro X: "); Serial.print(getOrientation(kXAxis));
     Serial.print("\tY: "); Serial.print(getOrientation(kYAxis));
     Serial.print("\tZ: "); Serial.println(getOrientation(kZAxis));
 #endif // DEBUG
