@@ -79,10 +79,10 @@ const int IR_FRONT_RIGHT_PIN[] = { 0 };
 const int IR_FRONT_LEFT_PIN[] = { 0 };
 const int IR_A_PILLAR_LEFT_PIN[] = { 0 };
 const int IR_A_CORNER_LEFT_PIN[] = { 0 };
-const int IR_A_BACK_LEFT_PIN[] = { 0 };
-const int IR_A_BACK_RIGHT_PIN[] = { 0 };
-const int IR_A_CORNER_RIGHT_PIN[] = { 0 };
-const int IR_A_PILLAR_RIGHT_PIN[] = { 0 };
+const int IR_BACK_LEFT_PIN[] = { 0 };
+const int IR_BACK_RIGHT_PIN[] = { 0 };
+const int IR_CORNER_RIGHT_PIN[] = { 0 };
+const int IR_PILLAR_RIGHT_PIN[] = { 0 };
 
 int IRDistance(int pins[], int length = -1);
 //End Sensor Arduino Setup
@@ -214,7 +214,7 @@ void loop() {
 			t2Stage++;
 			break;
 		case 1:
-			if (digitalRead(SONIC_FRONT_PIN) == 1)
+			if (!!digitalRead(SONIC_FRONT_PIN) || !!IRDistance(IR_FRONT_LEFT_PIN) || !!IRDistance(IR_FRONT_RIGHT_PIN))
 			{
 				setSpeed(0);
 			}
