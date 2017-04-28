@@ -32,6 +32,11 @@ void Gyro::setDistance(float x, float y, float z)
     m_distance.z += z;
 }
 
+double deadband(double input)
+{
+    return (input >= -DEADBAND && input <= DEADBAND) ? 0 : input;
+}
+
 void Gyro::setup()
 {
     if (!m_gyro.begin(Adafruit_BNO055::OPERATION_MODE_NDOF))
@@ -54,18 +59,18 @@ void Gyro::setup()
 void Gyro::loop()
 {
     m_gyro.getEvent(m_curPoint);
-    //imu::Vector<3> vec = m_gyro.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-    //m_curPoint->magnetic.x = vec[0]; m_curPoint->magnetic.y = vec[1]; m_curPoint->magnetic.z = vec[2];
-    //vec = m_gyro.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
-    //m_curPoint->acceleration.x = vec[0]; m_curPoint->acceleration.y = vec[1]; m_curPoint->acceleration.z = vec[2];
+    imu::Vector<3> vec = m_gyro.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+    m_mag.x = vec[0]; m_mag.y = vec[1]; m_mag.z = vec[2];
+    vec = m_gyro.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+    m_acceleration.x = deadband(vec[0]); m_acceleration.y = deadband(vec[1]); m_acceleration.z = deadband(vec[2]);
 
     // Record current event if timer has passed
     if (m_timer.hasPassed(RECORD_INTERVAL))
     {
         record(m_curPoint);
-        setVelocity(m_curPoint->acceleration.x * RECORD_INTERVAL / 1000,
-            m_curPoint->acceleration.y * RECORD_INTERVAL / 1000,
-            m_curPoint->acceleration.z * RECORD_INTERVAL / 1000);
+        setVelocity(m_acceleration.x * RECORD_INTERVAL / 1000,
+            m_acceleration.y * RECORD_INTERVAL / 1000,
+            m_acceleration.z * RECORD_INTERVAL / 1000);
         setVelocity(m_distance.x * RECORD_INTERVAL / 1000,
             m_distance.y * RECORD_INTERVAL / 1000,
             m_distance.z * RECORD_INTERVAL / 1000);
@@ -161,9 +166,9 @@ float Gyro::getDistanceFrom(float timeFrameMs, Axis axis)
     }
 }
 
-float Gyro::getHeading(float lat, float lon)
+float Gyro::getHeading()
 {
-    return atan2(m_curPoint->magnetic.y, m_curPoint->magnetic.x) * (180 / 3.14159) + COORD_DECL; // STUPID and probably doesn't work
+    return atan2(m_mag.y, m_mag.x) * (180 / 3.14159) + COORD_DECL;
 }
 
 void Gyro::record(sensors_event_t* point)
@@ -173,7 +178,11 @@ void Gyro::record(sensors_event_t* point)
     m_history.add(*point);
 #ifdef DEBUG
     Serial.print("Gyro X: "); Serial.print(getOrientation(kXAxis));
-    Serial.print("\tY: "); Serial.print(getOrientation(kYAxis));
-    Serial.print("\tZ: "); Serial.println(getOrientation(kZAxis));
+    Serial.print("  Y: "); Serial.print(getOrientation(kYAxis));
+    Serial.print("  Z: "); Serial.print(getOrientation(kZAxis));
+    Serial.print("  Accel X: "); Serial.print(m_acceleration.x);
+    Serial.print("  Y: "); Serial.print(m_acceleration.y);
+    Serial.print("  Z: "); Serial.print(m_acceleration.z);
+    Serial.print(" Heading: "); Serial.println(getHeading());
 #endif // DEBUG
 }

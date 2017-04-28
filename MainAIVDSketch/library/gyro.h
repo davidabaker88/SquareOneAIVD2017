@@ -18,6 +18,8 @@ const float COORD_LAT = 42.300688;
 const float COORD_LONG = 83.698129;
 const float COORD_DECL = 6.53; // +- .37 // 7.04 Mcity
 
+const float DEADBAND = 0.05;
+
 // Summary:
 // Wrapper/Manager for the Adafruit BNO055 9DoF sensor
 class Gyro
@@ -42,6 +44,8 @@ private:
 
     Tracer m_history;
     sensors_event_t* m_curPoint;
+    sensors_vec_t m_mag;
+    sensors_vec_t m_acceleration;
     sensors_vec_t m_velocity;
     sensors_vec_t m_distance;
 
@@ -54,6 +58,8 @@ private:
     // Sets the Velocity/Distance vectors
     void setVelocity(float x, float y, float z);
     void setDistance(float x, float y, float z);
+
+    double deadband(double input);
 
 public:
     // Constructs with sensorID which is 55
@@ -87,9 +93,7 @@ public:
     float getDistanceFrom(float timeFrameMs, Axis axis);
 
     // Gets the heading in degrees from true north
-    // Takes: lat - current latitudinal coordinate
-    //        lon - current longitudinal coordinate
-    float getHeading(float lat, float lon);
+    float getHeading();
 
     // History
     // Gets the current size of the history list
