@@ -28,7 +28,7 @@
 //All Pins should be a define or const int.  And should be in All caps
 
 //Start Steering Defines and Global Variables
-const int STEERING_PIN = 9;
+const int STEERING_PIN = 22;
 const double STEERING_P = 1.0;
 const double STEERING_I = 0;
 const double STEERING_D = 0;
@@ -66,19 +66,25 @@ dGPS gps;
 //End Magnetic Defines and Global Variables
 
 //Start Sensor Arduino Setup
-const int SONIC_FRONT_PIN = 0;
+const int SONIC_FRONT_PIN = 23;
 
-const int IR_A_PILLAR_LEFT_PIN[] = { 0 };
-const int IR_FRONT_LEFT_PIN[] = { 0 };
-const int IR_FRONT_RIGHT_PIN[] = { 0 };
-const int IR_A_PILLAR_RIGHT_PIN[] = { 0 };
-const int IR_CORNER_RIGHT_PIN[] = { 0 };
-const int IR_BACK_RIGHT_PIN[] = { 0 };
-const int IR_BACK_LEFT_PIN[] = { 0 };
-const int IR_CORNER_LEFT_PIN[] = { 0 };
+const int IR_A_PILLAR_LEFT_PIN[] = { 30, 31, 32 };
+const int IR_FRONT_LEFT_PIN[] = { 33, 34, 35, 36 };
+const int IR_FRONT_RIGHT_PIN[] = { 37, 38, 39, 40 };
+const int IR_A_PILLAR_RIGHT_PIN[] = { 41, 42, 43 };
+const int IR_CORNER_RIGHT_PIN[] = { 44 };
+const int IR_BACK_RIGHT_PIN[] = { 45, 46, 47, 48 };
+const int IR_BACK_LEFT_PIN[] = { 49, 50, 51, 52 };
+const int IR_CORNER_LEFT_PIN[] = { 53 };
 
 int IRDistance(int pins[], int length = -1);
 //End Sensor Arduino Setup
+
+//Start Pi Setup
+const int LIGHT_RED_PIN = 24;
+const int LIGHT_YELLOW_PIN = 25;
+const int LIGHT_GREEN_PIN = 26;
+//End Pi Setup
 
 //Start shared Globals and 
 enum TASK {
@@ -92,6 +98,8 @@ enum TASK {
     seven,
     eight
 };
+
+const int TASK_PIN[] = { 27, 28, 29 };
 
 TASK currentTask = none;
 
