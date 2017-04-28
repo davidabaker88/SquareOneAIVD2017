@@ -18,7 +18,7 @@ const float COORD_LAT = 42.300688;
 const float COORD_LONG = 83.698129;
 const float COORD_DECL = 6.53; // +- .37 // 7.04 Mcity
 
-const float DEADBAND = 0.05;
+const float DEADBAND = 0.08;
 
 // Summary:
 // Wrapper/Manager for the Adafruit BNO055 9DoF sensor

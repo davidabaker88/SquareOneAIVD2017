@@ -32,7 +32,7 @@ void Gyro::setDistance(float x, float y, float z)
     m_distance.z += z;
 }
 
-double deadband(double input)
+double Gyro::deadband(double input)
 {
     return (input >= -DEADBAND && input <= DEADBAND) ? 0 : input;
 }
