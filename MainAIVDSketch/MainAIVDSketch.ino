@@ -78,11 +78,11 @@ const int SONIC_FRONT_LEFT_PIN = 7;
 const int IR_FRONT_RIGHT_PIN[] = { 0 };
 const int IR_FRONT_LEFT_PIN[] = { 0 };
 const int IR_A_PILLAR_LEFT_PIN[] = { 0 };
-const int IR_A_CORNER_LEFT_PIN[] = { 0 };
+const int IR_CORNER_LEFT_PIN[] = { 0 };
 const int IR_BACK_LEFT_PIN[] = { 0 };
 const int IR_BACK_RIGHT_PIN[] = { 0 };
 const int IR_CORNER_RIGHT_PIN[] = { 0 };
-const int IR_PILLAR_RIGHT_PIN[] = { 0 };
+const int IR_A_PILLAR_RIGHT_PIN[] = { 0 };
 
 int IRDistance(int pins[], int length = -1);
 //End Sensor Arduino Setup
@@ -151,9 +151,9 @@ void setup() {
 
 
 void loop() {
-
+	
     gyro.loop();
-	  in = gyro.getOrientation(Gyro::kXAxis);
+	in = gyro.getOrientation(Gyro::kXAxis);
     pid.Compute();
     steering(out);
 
@@ -242,10 +242,11 @@ void loop() {
     {
         //start task 4 Code:  avoid obstacles/relatively straight.
 
+		setSpeed(5);
+
 		switch (t4Stage)
 		{
 		case 0:
-			setSpeed(5);
 			preTurnSp = sp;
 
 			if (!!IRDistance(IR_FRONT_LEFT_PIN))
@@ -253,7 +254,7 @@ void loop() {
 				sp += 90;
 				t4Stage++;
 			}
-			else if (!!IRDistance(IR_FRONT_RIGHT_PIN))
+			else if (!!IRDistance(IR_FRONT_RIGHT_PIN) || !!digitalRead(SONIC_FRONT_PIN))
 			{
 				sp -= 90;
 				t4Stage += 2;
@@ -261,16 +262,49 @@ void loop() {
 			break;
 
 		case 1: // turned right
+		{
 			if (in >= fmod(preTurnSp + 89, 360) && in <= fmod(preTurnSp + 91, 360))
 			{
-
+				if (!(!!IRDistance(IR_A_PILLAR_LEFT_PIN)))
+				{
+					sp -= 90;
+					t4Stage = 3;
+				}
 			}
 
 			break;
+		}
 
 		case 2: //turned left
+		{
+			int low = preTurnSp - 91;
+			if (low < 0) low += 360;
+			int high = fmod(low + 2, 360);
+
+			if (in >= low && in <= high)
+			{
+				if (!(!!IRDistance(IR_A_PILLAR_RIGHT_PIN)))
+				{
+					sp += 90;
+					t4Stage = 3;
+				}
+			}
 
 			break;
+		}
+
+		case 3:
+		{
+
+			int low = preTurnSp - 1;
+			if (low < 0) low += 360;
+			int high = fmod(preTurnSp + 1, 360);
+
+			if (in >= low && in <= high)
+				t4Stage = 0;
+
+			break;
+		}
 		}
 
         //end task4 Code
