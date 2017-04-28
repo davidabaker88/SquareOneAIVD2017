@@ -81,7 +81,6 @@ void Gyro::loop()
 void Gyro::reset()
 {
     m_history.clear();
-    setVelocity(0, 0, 0);
     setDistance(0, 0, 0);
 }
 
