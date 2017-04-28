@@ -67,22 +67,15 @@ dGPS gps;
 
 //Start Sensor Arduino Setup
 const int SONIC_FRONT_PIN = 0;
-const int SONIC_RIGHT_PIN = 1;
-const int SONIC_BACK_PIN = 2;
-const int SONIC_LEFT_PIN = 3;
-const int SONIC_FRONT_RIGHT_PIN = 4;
-const int SONIC_BACK_RIGHT_PIN = 5;
-const int SONIC_BACK_LEFT_PIN = 6;
-const int SONIC_FRONT_LEFT_PIN = 7;
 
-const int IR_FRONT_RIGHT_PIN[] = { 0 };
-const int IR_FRONT_LEFT_PIN[] = { 0 };
 const int IR_A_PILLAR_LEFT_PIN[] = { 0 };
-const int IR_CORNER_LEFT_PIN[] = { 0 };
-const int IR_BACK_LEFT_PIN[] = { 0 };
-const int IR_BACK_RIGHT_PIN[] = { 0 };
-const int IR_CORNER_RIGHT_PIN[] = { 0 };
+const int IR_FRONT_LEFT_PIN[] = { 0 };
+const int IR_FRONT_RIGHT_PIN[] = { 0 };
 const int IR_A_PILLAR_RIGHT_PIN[] = { 0 };
+const int IR_CORNER_RIGHT_PIN[] = { 0 };
+const int IR_BACK_RIGHT_PIN[] = { 0 };
+const int IR_BACK_LEFT_PIN[] = { 0 };
+const int IR_CORNER_LEFT_PIN[] = { 0 };
 
 int IRDistance(int pins[], int length = -1);
 //End Sensor Arduino Setup
@@ -104,6 +97,8 @@ TASK currentTask = none;
 
 //Task variables
 Chrono time;
+int preTurnSp;
+
 //task 1
 int t1Stage;
 //task 2
@@ -111,7 +106,6 @@ int t2Stage;
 //task 3
 //task 4
 int t4Stage;
-int preTurnSp;
 //task 5
 //task 5
 //task 6
@@ -146,7 +140,6 @@ void setup() {
     //End Magnetic Setup
     //Start Sensor Arduino Setup
     //End Sensor Arduino Setup
-
 }
 
 
@@ -267,7 +260,7 @@ void loop() {
 			{
 				if (!(!!IRDistance(IR_A_PILLAR_LEFT_PIN)))
 				{
-					sp -= 90;
+					sp = preTurnSp;
 					t4Stage = 3;
 				}
 			}
@@ -285,7 +278,7 @@ void loop() {
 			{
 				if (!(!!IRDistance(IR_A_PILLAR_RIGHT_PIN)))
 				{
-					sp += 90;
+					sp = preTurnSp;
 					t4Stage = 3;
 				}
 			}
@@ -293,12 +286,12 @@ void loop() {
 			break;
 		}
 
-		case 3:
+		case 3: //turned back forward
 		{
 
-			int low = preTurnSp - 1;
+			int low = sp - 1;
 			if (low < 0) low += 360;
-			int high = fmod(preTurnSp + 1, 360);
+			int high = fmod(sp + 1, 360);
 
 			if (in >= low && in <= high)
 				t4Stage = 0;
@@ -337,6 +330,19 @@ void loop() {
 				time.restart();
 				t7Stage++;
 			}
+			//Turning
+			else if (!!IRDistance(IR_FRONT_LEFT_PIN))
+			{
+				preTurnSp = sp;
+				sp += 90;
+				t7Stage = 2;
+			}
+			else if (!!IRDistance(IR_FRONT_RIGHT_PIN) || !!digitalRead(SONIC_FRONT_PIN))
+			{
+				preTurnSp = sp;
+				sp -= 90;
+				t7Stage = 3;
+			}
 
 			break;
 		case 1: 
@@ -356,6 +362,49 @@ void loop() {
 				}
 
 			break;
+
+		case 2: //right turn
+			if (in >= fmod(preTurnSp + 89, 360) && in <= fmod(preTurnSp + 91, 360))
+			{
+				if (!(!!IRDistance(IR_A_PILLAR_LEFT_PIN)))
+				{
+					sp = preTurnSp;
+					t4Stage = 4;
+				}
+			}
+
+			break;
+
+		case 3: //left turn
+		{
+			int low = preTurnSp - 91;
+			if (low < 0) low += 360;
+			int high = fmod(low + 2, 360);
+
+			if (in >= low && in <= high)
+			{
+				if (!(!!IRDistance(IR_A_PILLAR_RIGHT_PIN)))
+				{
+					sp = preTurnSp;
+					t7Stage = 4;
+				}
+			}
+
+			break;
+		}
+
+		case 4: 
+		{
+
+			int low = sp - 1;
+			if (low < 0) low += 360;
+			int high = fmod(sp + 1, 360);
+
+			if (in >= low && in <= high)
+				t4Stage = 0;
+
+			break;
+		}
 		}
 
         //end task7 Code
