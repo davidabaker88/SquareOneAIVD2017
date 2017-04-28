@@ -107,6 +107,7 @@ int t2Stage;
 //task 4
 int t4Stage;
 //task 5
+int t5Stage;
 //task 5
 //task 6
 //task 7
@@ -305,6 +306,21 @@ void loop() {
     if (currentTask == five)
     {
         //start task 5 Code:  Parallel park.
+        switch (t5Stage)
+        {
+            case 0: // Drive forward looking for a spot large enough
+                steering(0);
+            break;
+            case 1: // Turn 45 and back up; continue if at a-pillar
+                steering(45);
+            break;
+            case 2: // Turn -45 and continue backing up; may have to see if it hits other car 
+                steering(-45);
+            break;
+            case 3: // Turn 0 and back up to an appropriate distance
+                steering(0);
+            break;
+        }
         //end task5 Code
     }
     if (currentTask == six)
