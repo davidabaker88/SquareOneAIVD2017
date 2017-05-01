@@ -49,8 +49,9 @@ SharpIR irSense6(IR_PIN6, IR_MODEL);
 SharpIR irSense7(IR_PIN7, IR_MODEL);
 SharpIR irSense8(IR_PIN8, IR_MODEL);
 
-  NewPing sonarSensorA(53, 52, MAX_DISTANCE);
-  NewPing sonarSensorB(51, 50, MAX_DISTANCE); // (trigger, echo)
+NewPing sonarSensorA(9, 8, MAX_DISTANCE);
+NewPing sonarSensorB(6, 5, MAX_DISTANCE); // (trigger, echo)
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200) ;
