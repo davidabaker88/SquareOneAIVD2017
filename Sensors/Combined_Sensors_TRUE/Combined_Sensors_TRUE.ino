@@ -17,8 +17,6 @@ int IR_PIN6 = 6;
 int IR_PIN7 = 7;
 int IR_PIN8 = 8;
 
-int testPin = 30;
-
 
 //Precision = Threshold / ((2^numbits)-1); IE: Precesion = 50 cm when numbits = 2 & Threshold = 150
 
@@ -109,25 +107,6 @@ void loop() {
   else {
     Quadrant[0] = false;
   }
-
-//  Serial.print(" s1 ");
-//  Serial.print(dis);
-//Test Stuff start
- /* if (dis < 150 && dis > 10)
-  {
-    digitalWrite(testPin,HIGH);
-    
-    disToShow1 = dis/8;
-  }
-  else
-  {
-    digitalWrite(testPin,LOW);
-    disToShow1 = 0;
-  }
-  */
-//Test Stuff end
- 
-
 }
 
 
