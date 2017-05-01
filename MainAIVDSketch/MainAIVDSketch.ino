@@ -77,7 +77,8 @@ const int IR_BACK_RIGHT_PIN[] = { 45, 46, 47, 48 };
 const int IR_BACK_LEFT_PIN[] = { 49, 50, 51, 52 };
 const int IR_CORNER_LEFT_PIN[] = { 53 };
 
-int IRDistance(int pins[], int length = -1);
+int ToDecimal(const int pins[], int length = -1);
+int IRDistance(const int pins[], int length = -1);
 //End Sensor Arduino Setup
 
 //Start Pi Setup
@@ -143,26 +144,35 @@ void setup() {
     gyro.setup();
     //End 9DoF Setup
     //Start GPS Setup
-	gps.init();
+    //gps.init();
     //End GPS Setup
     //Start Magnetic Setup
     //End Magnetic Setup
     //Start Sensor Arduino Setup
     //End Sensor Arduino Setup
+
+    for(int i = 23; i<53; i++)
+  {
+    pinMode(i, INPUT);
+  }
+
+  pinMode(22, OUTPUT);
 }
 
 
 void loop() {
+
+    currentTask = (TASK)ToDecimal(TASK_PIN, 3);
 	
     gyro.loop();
-	in = gyro.getOrientation(Gyro::kXAxis);
+    in = gyro.getOrientation(Gyro::kXAxis);
     pid.Compute();
     steering(out);
 
-    if (currentTask == none) {
+    if (true) {
         //setBrake();
     }
-    if (currentTask == one)
+    else if (currentTask == one)
     {
         //start task 1 Code:  go forward X meters turn right.
         switch (t1Stage)
@@ -205,7 +215,7 @@ void loop() {
         }
         //end task1 Code
     }
-    if (currentTask == two)
+    else if (currentTask == two)
     {
         //start task 2 Code:  go forward X meters if obstacle, stop.
 		switch (t2Stage)
@@ -235,12 +245,12 @@ void loop() {
 		}
         //end task2 Code
     }
-    if (currentTask == three)
+    else if (currentTask == three)
     {
         //start task 3 Code:  navagate fixed course.
         //end task3 Code
     }
-    if (currentTask == four)
+    else if (currentTask == four)
     {
         //start task 4 Code:  avoid obstacles/relatively straight.
 
@@ -311,7 +321,7 @@ void loop() {
 
         //end task4 Code
     }
-    if (currentTask == five)
+    else if (currentTask == five)
     {
         //start task 5 Code:  Parallel park.
         switch (t5Stage)
@@ -331,12 +341,12 @@ void loop() {
         }
         //end task5 Code
     }
-    if (currentTask == six)
+    else if (currentTask == six)
     {
         //start task 6 Code:  traffic light.
         //end task6 Code
     }
-    if (currentTask == seven)
+    else if (currentTask == seven)
     {
         //start task 7 Code:  gps navagation.
 		gps.update(lat[destStage], lon[destStage]);
@@ -433,7 +443,7 @@ void loop() {
 
         //end task7 Code
     }
-    if (currentTask == eight)
+    else if (currentTask == eight)
     {
         //start task 8 Code:  Platoon?
         //end task8 Code
@@ -463,16 +473,21 @@ void steering(float degreeIn) {
   //Serial.write((int)degree);
 }
 
+int ToDecimal(const int pins[], int length = -1)
+{
+  if (length == -1)
+  length = sizeof(pins) / sizeof(pins[0]);
+
+  int num;
+  for (int i = 0; i < length; i++)
+    if (digitalRead(pins[i]) == 1)
+      num += pow(2, i);
+
+  return num;
+}
+
 //Takes IR pins from least to most and converts into distance (cm)
 int IRDistance(const int pins[], int length = -1)
 {
-	if (length == -1)
-		length = sizeof(pins) / sizeof(pins[0]);
-
-	int num;
-	for (int i = 0; i < length; i++)
-		if (digitalRead(pins[i]) == 1)
-			num += pow(2, i);
-
-	return (int)(num * (150.0 / pow(2, length)));
+	return (int)(ToDecimal(pins, length) * (150.0 / pow(2, length)));
 }

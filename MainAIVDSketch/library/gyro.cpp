@@ -71,9 +71,9 @@ void Gyro::loop()
         setVelocity(m_acceleration.x * RECORD_INTERVAL / 1000,
             m_acceleration.y * RECORD_INTERVAL / 1000,
             m_acceleration.z * RECORD_INTERVAL / 1000);
-        setVelocity(m_distance.x * RECORD_INTERVAL / 1000,
-            m_distance.y * RECORD_INTERVAL / 1000,
-            m_distance.z * RECORD_INTERVAL / 1000);
+        setDistance(m_velocity.x * RECORD_INTERVAL / 1000,
+			m_velocity.y * RECORD_INTERVAL / 1000,
+			m_velocity.z * RECORD_INTERVAL / 1000);
         m_timer.restart();
     }
 }
@@ -178,10 +178,10 @@ void Gyro::record(sensors_event_t* point)
 #ifdef DEBUG
     Serial.print("Gyro X: "); Serial.print(getOrientation(kXAxis));
     Serial.print("  Y: "); Serial.print(getOrientation(kYAxis));
-    Serial.print("  Z: "); Serial.print(getOrientation(kZAxis));
     Serial.print("  Accel X: "); Serial.print(m_acceleration.x);
     Serial.print("  Y: "); Serial.print(m_acceleration.y);
-    Serial.print("  Z: "); Serial.print(m_acceleration.z);
-    Serial.print(" Heading: "); Serial.println(getHeading());
+    Serial.print("  Heading: "); Serial.print(getHeading());
+	Serial.print("  Velocity: "); Serial.print(getVelocity(kXAxis));
+	Serial.print("  Distance: "); Serial.println(getDistance(kXAxis));
 #endif // DEBUG
 }
