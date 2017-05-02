@@ -39,6 +39,15 @@ PID pid{ &in, &out, &sp, STEERING_P, STEERING_I, STEERING_D, DIRECT };
 Servo myServo;
 
 void steering(float degreeIn);
+void Count();
+float CountDistance(int count);
+
+const int INTERRUPT_PIN = 2;
+const float WHEEL_CIRCUMFERENCE = 10 * PI * 0.0254;
+
+long motorCount = 0;
+
+float Current;
 //End Steering Defines and Global Variables
 
 //Start Drive Defines and Global Variables
@@ -48,7 +57,7 @@ void steering(float degreeIn);
 //You need more current to let the motor take more load to get it to higher speeds
 //The hardcoded max current is 10.0 MAX and -10.0 MIN (setting negative current values
 //will make the car go backwards.
-void setSpeed(float Current);
+void setSpeed();
 void setBrake();
 //End Drive Defines and Global Variables
 
@@ -139,6 +148,9 @@ void setup() {
     //End Steering Setup
     //Start Drive Setup
     Serial1.begin(115200);
+
+	pinMode(INTERRUPT_PIN, INPUT_PULLUP);
+	attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), Count, CHANGE);
     //End Drive Setup
     //Start 9DoF Setup
     gyro.setup();
@@ -163,11 +175,13 @@ void setup() {
 void loop() {
 
     currentTask = (TASK)ToDecimal(TASK_PIN, 3);
-	
+
     gyro.loop();
     in = gyro.getOrientation(Gyro::kXAxis);
     pid.Compute();
     steering(out);
+
+	Serial.println(CountDistance(motorCount));
 
     if (true) {
         //setBrake();
@@ -179,36 +193,39 @@ void loop() {
         {
         case 0:
             time.restart();
-            t1Stage++;
+            t1Stage = 1;
             break;
         case 1:
             if (time.hasPassed(5000))
             {
-                setSpeed(5.0);
+				Current = 5;
+                setSpeed();
                 time.restart();
-                t1Stage++;
+                t1Stage = 2;
             }
             break;
         case 2:
-            if (gyro.getDistanceFrom(time.elapsed(), Gyro::kXAxis) >= 3)
+			Serial.println("Motor on");
+            if (CountDistance(motorCount) >= 3)
             {
                 time.restart();
                 sp = 90;
-                t1Stage++;
+                t1Stage = 3;
             break;
             }
         case 3:
             if (in >= 89 && in <= 91)
             {
                 time.restart();
-                t1Stage++;
+                t1Stage = 4;
             }
             break;
         case 4:
-            if (gyro.getDistanceFrom(time.elapsed(), Gyro::kXAxis) >= 3)
+            if (CountDistance(motorCount) >= 3)
             {
-                setSpeed(0);
-				t1Stage++;
+				Current = 0;
+                setSpeed();
+				t1Stage = 5;
 
                 //done
             }
@@ -222,24 +239,28 @@ void loop() {
 		{
 		case 0:
 			time.restart();
-			setSpeed(5.0);
+			Current = 5;
+			setSpeed();
 			t2Stage++;
 			break;
 		case 1:
 			if (!!digitalRead(SONIC_FRONT_PIN) || !!IRDistance(IR_FRONT_LEFT_PIN) || !!IRDistance(IR_FRONT_RIGHT_PIN))
 			{
-				setSpeed(0);
+				Current = 0;
+				setSpeed();
 			}
-			else if (gyro.getDistanceFrom(time.elapsed(), Gyro::kXAxis) >= 11)
+			else if (CountDistance(motorCount) >= 11)
 			{
-				setSpeed(0);
+				Current = 0;
+				setSpeed();
 				t2Stage++;
 
 				//done
 			}
 			else 
 			{
-				setSpeed(5);
+				Current = 5;
+				setSpeed();
 			}
 			break;
 		}
@@ -254,7 +275,8 @@ void loop() {
     {
         //start task 4 Code:  avoid obstacles/relatively straight.
 
-		setSpeed(5);
+		Current = 5;
+		setSpeed();
 
 		switch (t4Stage)
 		{
@@ -355,12 +377,14 @@ void loop() {
 		{
 		case 0: // navigating
 			//assuming pointing north
-			setSpeed(5);
+			Current = 0;
+			setSpeed();
 			sp = gps.angleToPoint();
 
 			if (gps.Dist() <= 0.5)
 			{
-				setSpeed(0);
+				Current = 0;
+				setSpeed();
 				time.restart();
 				t7Stage++;
 			}
@@ -455,7 +479,7 @@ void loop() {
 	sp = fmod(sp, 360);
 }
 
-void setSpeed(float Current) {
+void setSpeed() {
     VescUartSetCurrent(Current);
 }
 
@@ -466,9 +490,12 @@ void setBrake() {
 void steering(float degreeIn) {
   float degree = degreeIn;
   degree += 90;
-  if (degree > 180) {
-      degree = 180;
+  if (degree > 150) {
+	  degree = 150;
   }
+  else if (degree < 30)
+	  degree = 30;
+
   myServo.write(degree);
   //Serial.write((int)degree);
 }
@@ -490,4 +517,26 @@ int ToDecimal(const int pins[], int length = -1)
 int IRDistance(const int pins[], int length = -1)
 {
 	return (int)(ToDecimal(pins, length) * (150.0 / pow(2, length)));
+}
+
+void Count() 
+{
+	if (digitalRead(INTERRUPT_PIN) == 1) 
+	{
+		if (Current > 0) 
+		{
+			motorCount++;
+			Serial.println(motorCount);
+		}
+		else if (Current < 0) 
+		{
+			motorCount--;
+			Serial.println(motorCount);
+		}
+	}
+}
+
+float CountDistance(int count)
+{
+	return (count / (16.0 * 7)) * WHEEL_CIRCUMFERENCE;
 }
