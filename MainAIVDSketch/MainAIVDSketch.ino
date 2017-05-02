@@ -183,11 +183,12 @@ void loop() {
 
 	Serial.println(CountDistance(motorCount));
 
-    if (true) {
+    if (currentTask == none) {
         //setBrake();
     }
     else if (currentTask == one)
     {
+
         //start task 1 Code:  go forward X meters turn right.
         switch (t1Stage)
         {
