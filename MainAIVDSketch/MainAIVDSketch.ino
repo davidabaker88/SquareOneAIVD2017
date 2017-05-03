@@ -34,7 +34,8 @@ const double STEERING_I = 0;
 const double STEERING_D = 0;
 
 double in, out, sp;
-PID pid{ &in, &out, &sp, STEERING_P, STEERING_I, STEERING_D, DIRECT };
+double pidIn;
+PID pid{ &pidIn, &out, 0, STEERING_P, STEERING_I, STEERING_D, DIRECT };
 
 Servo myServo;
 
@@ -77,13 +78,13 @@ dGPS gps;
 //Start Sensor Arduino Setup
 const int SONIC_FRONT_PIN = 23;
 
-const int IR_A_PILLAR_LEFT_PIN[] = { 30, 31, 32 };
-const int IR_FRONT_LEFT_PIN[] = { 33, 34, 35, 36 };
-const int IR_FRONT_RIGHT_PIN[] = { 37, 38, 39, 40 };
-const int IR_A_PILLAR_RIGHT_PIN[] = { 41, 42, 43 };
+const int IR_A_PILLAR_LEFT_PIN[] = { 32, 31, 30 };
+const int IR_FRONT_LEFT_PIN[] = { 36, 35, 34, 33 };
+const int IR_FRONT_RIGHT_PIN[] = { 40, 39, 38, 37 };
+const int IR_A_PILLAR_RIGHT_PIN[] = { 43, 42, 41 };
 const int IR_CORNER_RIGHT_PIN[] = { 44 };
-const int IR_BACK_RIGHT_PIN[] = { 45, 46, 47, 48 };
-const int IR_BACK_LEFT_PIN[] = { 49, 50, 51, 52 };
+const int IR_BACK_RIGHT_PIN[] = { 48, 47, 46, 45 };
+const int IR_BACK_LEFT_PIN[] = { 52, 51, 50, 49 };
 const int IR_CORNER_LEFT_PIN[] = { 53 };
 
 int ToDecimal(const int pins[], int length = -1);
@@ -145,6 +146,8 @@ void setup() {
     //End Initialization
     //Start Steering Setup
     myServo.attach(STEERING_PIN);
+	pid.SetMode(AUTOMATIC);
+	pid.SetOutputLimits(-60, 60);
     //End Steering Setup
     //Start Drive Setup
     Serial1.begin(115200);
@@ -178,13 +181,17 @@ void loop() {
 
     gyro.loop();
     in = gyro.getOrientation(Gyro::kXAxis);
+
+	if (abs(sp - in) <= 180)
+		pidIn = sp - in;
+	else pidIn = sp - in + 360;
+
     pid.Compute();
     steering(out);
 
-	Serial.println(CountDistance(motorCount));
-
     if (currentTask == none) {
-        //setBrake();
+		Current = 5;
+		setSpeed();
     }
     else if (currentTask == one)
     {
@@ -193,6 +200,7 @@ void loop() {
         switch (t1Stage)
         {
         case 0:
+			motorCount = 0;
             time.restart();
             t1Stage = 1;
             break;
@@ -206,18 +214,19 @@ void loop() {
             }
             break;
         case 2:
-			Serial.println("Motor on");
+			//Serial.println("Motor on");
             if (CountDistance(motorCount) >= 3)
             {
                 time.restart();
                 sp = 90;
                 t1Stage = 3;
-            break;
             }
+			break;
         case 3:
             if (in >= 89 && in <= 91)
             {
                 time.restart();
+				motorCount = 0;
                 t1Stage = 4;
             }
             break;
@@ -227,9 +236,9 @@ void loop() {
 				Current = 0;
                 setSpeed();
 				t1Stage = 5;
-
                 //done
             }
+			break;
         }
         //end task1 Code
     }
@@ -245,10 +254,20 @@ void loop() {
 			t2Stage++;
 			break;
 		case 1:
+			Serial.print(digitalRead(33));
+			Serial.print(digitalRead(34));
+			Serial.print(digitalRead(35));
+			Serial.print(digitalRead(36));
+			Serial.print(", ");
+			Serial.print(digitalRead(37));
+			Serial.print(digitalRead(38));
+			Serial.print(digitalRead(39));
+			Serial.println(digitalRead(40));
 			if (!!digitalRead(SONIC_FRONT_PIN) || !!IRDistance(IR_FRONT_LEFT_PIN) || !!IRDistance(IR_FRONT_RIGHT_PIN))
 			{
 				Current = 0;
 				setSpeed();
+				//Serial.println("STOP");
 			}
 			else if (CountDistance(motorCount) >= 11)
 			{
@@ -527,12 +546,12 @@ void Count()
 		if (Current > 0) 
 		{
 			motorCount++;
-			Serial.println(motorCount);
+			//Serial.println(motorCount);
 		}
 		else if (Current < 0) 
 		{
 			motorCount--;
-			Serial.println(motorCount);
+			//Serial.println(motorCount);
 		}
 	}
 }
