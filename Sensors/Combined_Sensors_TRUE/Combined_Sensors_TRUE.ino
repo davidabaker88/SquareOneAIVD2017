@@ -73,34 +73,37 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   int dis = 0;
-  dis= irSense1.getDistance();
+  dis= irSense1.distance();
   BinaryConverterAndOutput(sizeof(outPinArray1[0]),dis,outPinArray1,WheelTrashhold);
   
-  int dis2 = irSense2.getDistance();
+  int dis2 = irSense2.distance();
   BinaryConverterAndOutput(sizeof(outPinArray2[0]),dis,outPinArray2,FrontTrashhold);
   
-  int dis3 = irSense3.getDistance();
+  int dis3 = irSense3.distance();
   BinaryConverterAndOutput(sizeof(outPinArray3[0]),dis,outPinArray3,FrontTrashhold);
   
-  int dis4 = irSense4.getDistance();
+  int dis4 = irSense4.distance();
   BinaryConverterAndOutput(sizeof(outPinArray4[0]),dis,outPinArray4,WheelTrashhold);
   
-  int dis5 = irSense5.getDistance();
+  int dis5 = irSense5.distance();
   BinaryConverterAndOutput(sizeof(outPinArray5[0]),dis,outPinArray5,BacksideTrashhold);
   
-  int dis6 = irSense6.getDistance();
+  int dis6 = irSense6.distance();
   BinaryConverterAndOutput(sizeof(outPinArray6[0]),dis,outPinArray6,BackTrashhold);
   
-  int dis7 = irSense7.getDistance();
+  int dis7 = irSense7.distance();
   BinaryConverterAndOutput(sizeof(outPinArray7[0]),dis,outPinArray7,BackTrashhold);
   
-  int dis8 = irSense8.getDistance();
+  int dis8 = irSense8.distance();
   BinaryConverterAndOutput(sizeof(outPinArray8[0]),dis,outPinArray8,BacksideTrashhold);
 
   //sonic sensors
   cm[0] =sonarSensorA.ping_median(10 ,MAX_DISTANCE);
   cm[1] =sonarSensorB.ping_median(10 ,MAX_DISTANCE);
   Serial.println(cm[0]);
+  Serial.print(dis);
+  Serial.print(" front left ");
+  Serial.println(dis2);
  if  ((cm[0] < FRONT_THRESHOLD || cm[1] < FRONT_THRESHOLD) && (cm[0] > 0 || cm[1] > 0))
   {
     Quadrant[0] = true;
