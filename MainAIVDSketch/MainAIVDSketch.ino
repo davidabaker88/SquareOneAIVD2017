@@ -45,6 +45,7 @@ float CountDistance(int count);
 
 const int INTERRUPT_PIN = 2;
 const float WHEEL_CIRCUMFERENCE = 10 * PI * 0.0254;
+const float TURN_RADIUS = 3;
 
 long motorCount = 0;
 
@@ -312,17 +313,47 @@ void loop() {
 
 			if (!!IRDistance(IR_FRONT_LEFT_PIN))
 			{
-				sp += 90;
-				t4Stage++;
+				motorCount = 0;
+				Current = -1;
+				setSpeed();
+
+				t4Stage = 1;
+				Serial.println("Back up");
 			}
 			else if (!!IRDistance(IR_FRONT_RIGHT_PIN) || !!digitalRead(SONIC_FRONT_PIN))
 			{
-				sp -= 90;
-				t4Stage += 2;
+				motorCount = 0;
+				Current = -1;
+				setSpeed();
+
+				t4Stage  = 2;
+				Serial.println("Back up");
 			}
 			break;
 
-		case 1: // turned right
+		case 1:
+			if (CountDistance(motorCount) <= -TURN_RADIUS)
+			{
+				Current = 5;
+				setSpeed();
+				sp += 90;
+				t1Stage = 3;
+				Serial.println("Turn Left");
+			}
+			break;
+
+		case 2:
+			if (CountDistance(motorCount) <= -TURN_RADIUS)
+			{
+				Current = 5;
+				setSpeed();
+				sp -= 90;
+				t1Stage = 4;
+				Serial.println("Turn Right");
+			}
+			break;
+
+		case 3: // turned right
 		{
 			if (in >= fmod(preTurnSp + 89, 360) && in <= fmod(preTurnSp + 91, 360))
 			{
@@ -330,13 +361,14 @@ void loop() {
 				{
 					sp = preTurnSp;
 					t4Stage = 3;
+					//more
 				}
 			}
 
 			break;
 		}
 
-		case 2: //turned left
+		case 4: //turned left
 		{
 			int low = preTurnSp - 91;
 			if (low < 0) low += 360;
@@ -354,7 +386,7 @@ void loop() {
 			break;
 		}
 
-		case 3: //turned back forward
+		case 5: //turned back forward
 		{
 
 			int low = sp - 1;

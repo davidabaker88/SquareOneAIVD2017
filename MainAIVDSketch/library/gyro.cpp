@@ -46,7 +46,7 @@ void Gyro::setup()
     }
 
     uint8_t sys, g, a, m;
-    while (!sys/*!m_gyro.isFullyCalibrated()*/)
+    while (!g/*!m_gyro.isFullyCalibrated()*/)
     {
         m_gyro.getCalibration(&sys, &g, &a, &m);
         Serial.print(sys); Serial.print(g); Serial.print(a); Serial.println(m);
@@ -184,4 +184,7 @@ void Gyro::record(sensors_event_t* point)
 	Serial.print("  Velocity: "); Serial.print(getVelocity(kXAxis));
 	Serial.print("  Distance: "); Serial.println(getDistance(kXAxis));
 #endif // DEBUG
+	//uint8_t a, b, c;
+	//m_gyro.getSystemStatus(&a, &b, &c);
+	//Serial.print("Alive: "); Serial.println(c);
 }

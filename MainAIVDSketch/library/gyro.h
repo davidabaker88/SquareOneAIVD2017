@@ -9,7 +9,7 @@
 
 #include "tracer.h"
 
-#define DEBUG
+//#define DEBUG
 
 const float RECORD_INTERVAL = 69; // ms
 const int BUFFER_MAX = 100;
