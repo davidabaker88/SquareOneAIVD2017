@@ -74,36 +74,49 @@ void loop() {
   // put your main code here, to run repeatedly:
   int dis = 0;
   dis= irSense1.distance();
-  BinaryConverterAndOutput(sizeof(outPinArray1[0]),dis,outPinArray1,WheelTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray1)/sizeof(outPinArray1[0])),dis,outPinArray1,WheelTrashhold);
   
   int dis2 = irSense2.distance();
-  BinaryConverterAndOutput(sizeof(outPinArray2[0]),dis,outPinArray2,FrontTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray2)/sizeof(outPinArray2[0])),dis,outPinArray2,FrontTrashhold);
   
   int dis3 = irSense3.distance();
-  BinaryConverterAndOutput(sizeof(outPinArray3[0]),dis,outPinArray3,FrontTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray3)/sizeof(outPinArray3[0])),dis,outPinArray3,FrontTrashhold);
   
   int dis4 = irSense4.distance();
-  BinaryConverterAndOutput(sizeof(outPinArray4[0]),dis,outPinArray4,WheelTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray4)/sizeof(outPinArray4[0])),dis,outPinArray4,WheelTrashhold);
   
   int dis5 = irSense5.distance();
-  BinaryConverterAndOutput(sizeof(outPinArray5[0]),dis,outPinArray5,BacksideTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray5)/sizeof(outPinArray5[0])),dis,outPinArray5,BacksideTrashhold);
   
   int dis6 = irSense6.distance();
-  BinaryConverterAndOutput(sizeof(outPinArray6[0]),dis,outPinArray6,BackTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray6)/sizeof(outPinArray6[0])),dis,outPinArray6,BackTrashhold);
   
   int dis7 = irSense7.distance();
-  BinaryConverterAndOutput(sizeof(outPinArray7[0]),dis,outPinArray7,BackTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray7)/sizeof(outPinArray7[0])),dis,outPinArray7,BackTrashhold);
   
   int dis8 = irSense8.distance();
-  BinaryConverterAndOutput(sizeof(outPinArray8[0]),dis,outPinArray8,BacksideTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray8)/sizeof(outPinArray8[0])),dis,outPinArray8,BacksideTrashhold);
 
   //sonic sensors
   cm[0] =sonarSensorA.ping_median(10 ,MAX_DISTANCE);
   cm[1] =sonarSensorB.ping_median(10 ,MAX_DISTANCE);
-  Serial.println(cm[0]);
-  Serial.print(dis);
-  Serial.print(" front left ");
-  Serial.println(dis2);
+  //Serial.println(cm[0]);
+  Serial.print(" 1  ");  Serial.println(dis);
+  //Serial.print(" 2 ");  Serial.println(dis2);
+  //Serial.print(" 3 ");  Serial.println(dis3);
+  //Serial.print(" 4 ");  Serial.println(dis4);
+  //Serial.print(" 5 ");  Serial.println(dis5);
+  //Serial.print(" 6 ");  Serial.println(dis6);
+  //Serial.print(" 7 ");  Serial.println(dis7);
+  //Serial.print(" 8 ");  Serial.println(dis8);
+  Serial.print(digitalRead(outPinArray1[0])); Serial.print(digitalRead(outPinArray1[1])); Serial.println(digitalRead(outPinArray1[2]));//30-32
+  //Serial.print(digitalRead(outPinArray2[0])); Serial.print(digitalRead(outPinArray2[1])); Serial.print(digitalRead(outPinArray2[2])); Serial.println(digitalRead(outPinArray2[3]));//33-36
+  //Serial.print(digitalRead(outPinArray3[0])); Serial.print(digitalRead(outPinArray3[1])); Serial.print(digitalRead(outPinArray3[2])); Serial.println(digitalRead(outPinArray3[3]));//37-40
+  //Serial.print(digitalRead(outPinArray4[0])); Serial.print(digitalRead(outPinArray4[1])); Serial.println(digitalRead(outPinArray4[2]));//41-43
+  //Serial.println(digitalRead(outPinArray5[0]));//44
+  //Serial.print(digitalRead(outPinArray6[0])); Serial.print(digitalRead(outPinArray6[1])); Serial.print(digitalRead(outPinArray6[2])); Serial.println(digitalRead(outPinArray6[3]));//45-48
+  //Serial.print(digitalRead(outPinArray7[0])); Serial.print(digitalRead(outPinArray7[1])); Serial.print(digitalRead(outPinArray7[2])); Serial.println(digitalRead(outPinArray7[3]));//49-52
+  //Serial.println(digitalRead(outPinArray8[0]));//53
  if  ((cm[0] < FRONT_THRESHOLD || cm[1] < FRONT_THRESHOLD) && (cm[0] > 0 || cm[1] > 0))
   {
     Quadrant[0] = true;
@@ -116,6 +129,8 @@ void loop() {
 
 void BinaryConverterAndOutput(int numBits, int distanceConv,int outPinArray[],int THRESHOLD)
 {
+    Serial.println("entering Converter");
+    delay(1000);
     if(distanceConv > THRESHOLD){
       distanceConv = 0; 
     }
@@ -126,6 +141,7 @@ void BinaryConverterAndOutput(int numBits, int distanceConv,int outPinArray[],in
     {
        if (bitRead(distanceConv, i) == 1)
       {
+        Serial.print("writing to pin ");Serial.print(outPinArray[i]);
         digitalWrite(outPinArray[i], HIGH);
       }
       else
@@ -133,5 +149,6 @@ void BinaryConverterAndOutput(int numBits, int distanceConv,int outPinArray[],in
         digitalWrite(outPinArray[i], LOW);
       }
     }
+    Serial.println();
 }
 
