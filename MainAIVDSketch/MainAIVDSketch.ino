@@ -45,7 +45,7 @@ float CountDistance(int count);
 
 const int INTERRUPT_PIN = 2;
 const float WHEEL_CIRCUMFERENCE = 10 * PI * 0.0254;
-const float TURN_RADIUS = 3;
+const float TURN_RADIUS = 2.2f;
 
 long motorCount = 0;
 
@@ -360,8 +360,8 @@ void loop() {
 				if (!(!!IRDistance(IR_A_PILLAR_LEFT_PIN)))
 				{
 					sp = preTurnSp;
-					t4Stage = 3;
-					//more
+					t4Stage = 5;
+					Serial.println("Back up again");
 				}
 			}
 
@@ -378,15 +378,32 @@ void loop() {
 			{
 				if (!(!!IRDistance(IR_A_PILLAR_RIGHT_PIN)))
 				{
-					sp = preTurnSp;
-					t4Stage = 3;
+					motorCount = 0;
+					Current = -5;
+					setSpeed();
+
+					t4Stage = 5;
+					Serial.println("Back up again");
 				}
 			}
 
 			break;
 		}
 
-		case 5: //turned back forward
+		case 5:
+			if (CountDistance(motorCount) <= -TURN_RADIUS)
+			{
+				motorCount = 0;
+				Current = 5;
+				setSpeed();
+				sp = preTurnSp;
+
+				t4Stage = 6;
+				Serial.println("Turn back");
+			}
+			break;
+
+		case 6: //turned back forward
 		{
 
 			int low = sp - 1;
@@ -394,7 +411,10 @@ void loop() {
 			int high = fmod(sp + 1, 360);
 
 			if (in >= low && in <= high)
+			{
 				t4Stage = 0;
+				Serial.println("Done, let's do it again!");
+			}
 
 			break;
 		}
