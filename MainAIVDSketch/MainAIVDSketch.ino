@@ -203,6 +203,7 @@ void loop() {
 
 	//Serial.print(in); Serial.print(", "); Serial.print(sp); Serial.print(", "); Serial.println(out);
 	//Serial.println(analogRead(0));
+	//Serial.println(digitalRead(IR_FRONT_LEFT_PIN[0]) | digitalRead(IR_FRONT_LEFT_PIN[1]) | digitalRead(IR_FRONT_LEFT_PIN[2]) | digitalRead(IR_FRONT_LEFT_PIN[3]));
 
     if (currentTask == none) {
 		Current = 5;
@@ -275,7 +276,7 @@ void loop() {
 			{
 				Current = 0;
 				setSpeed();
-				//Serial.println("STOP");
+				Serial.println("STOP");
 			}
 			else if (CountDistance(motorCount) >= 11)
 			{
@@ -314,24 +315,25 @@ void loop() {
 			if (!!IRDistance(IR_FRONT_LEFT_PIN))
 			{
 				motorCount = 0;
-				Current = -1;
+				Current = -5;
 				setSpeed();
 
 				t4Stage = 1;
-				Serial.println("Back up");
+				Serial.println("Back up 1");
 			}
 			else if (!!IRDistance(IR_FRONT_RIGHT_PIN) || !!digitalRead(SONIC_FRONT_PIN))
 			{
 				motorCount = 0;
-				Current = -1;
+				Current = -5;
 				setSpeed();
 
 				t4Stage  = 2;
-				Serial.println("Back up");
+				Serial.println("Back up 2");
 			}
 			break;
 
 		case 1:
+			Serial.println(CountDistance(motorCount));
 			if (CountDistance(motorCount) <= -TURN_RADIUS)
 			{
 				Current = 5;
