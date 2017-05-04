@@ -6,10 +6,11 @@
 // Software serial TX & RX Pins for the GPS module
 // Initiate the software serial connection
 
-int ledPin = 13;                  // LED test pin
-float desLat=0;                   //Destination Latitude filled by user in Serial Monitor Box
-float desLon=0;                   //Destination Longitude filled by user in Serial Monitor Box
+int desIndex = 0;
+float desLat[] = {0};                   //Destination Latitude filled by user in Serial Monitor Box
+float desLon[] = {0};                   //Destination Longitude filled by user in Serial Monitor Box
 float destAngle;
+int completePin = 24;
 char fla[2];                      //flag (Y/N) whether to print checksum or not. Filled by user in Serial Monitor Box
 dGPS dgps = dGPS();               // Construct dGPS class
 
@@ -45,26 +46,26 @@ float getdestcoord()
   }
 
 void setup() {
-  pinMode(ledPin, OUTPUT);       // Initialize LED pin
+  pinMode(completePin, OUTPUT);       // Initialize LED pin
   Serial.end();                  // Close any previously established connections
   Serial.begin(9600);            // Serial output back to computer.  On.
   dgps.init();                   // Run initialization routine for dGPS.
   delay(1000);  
   Serial.print("Enter Destination Latitude (in degrees): ");
-  delay(1000);
-  desLat=getdestcoord();
-  Serial.println(desLat);
+  delay(3000);
+  desLat[]=getdestcoord();
+  Serial.println(desLat[desIndex]);
   
   Serial.print("Enter Destination Longitude (in degrees): ");
   delay(3000);
-  desLon=getdestcoord();
-  Serial.println(desLon);  
+  desLon[desIndex]=getdestcoord();
+  Serial.println(desLon[desIndex]);  
   
 }
 
 void loop() {
   
-  dgps.update(desLat, desLon);    // Calling this updates the GPS data.  The data in dGPS variables stays the same unless
+  dgps.update(desLat[desIndex], desLon[desIndex]);    // Calling this updates the GPS data.  The data in dGPS variables stays the same unless
                                   // this function is called.  When this function is called, the data is updated.
   
   Serial.println("Latitude: ");
@@ -78,6 +79,19 @@ void loop() {
   Serial.print("Slope: ");
   Serial.print(dgps.angleToPoint());
   Serial.println(" degrees");
+
+  if(desLat[desIndex] = dgps.Lat() && desLon[desIndex] = dgps.Lon())
+  {
+   //The Code here should signal that we are ready to move on
+   digitalWrite(completePin,HIGH);
+    //delay is there to make sure the singal is seen and to motion that we are ready to move on
+    delay(10000);
+    digitalWrite(completePin,LOW);
+    // The code here is going to shift the array to the next set of numbers
+    desIndex++;
+    desLat[desIndex];
+    desLon[desIndex];
+  }
 
 
   
