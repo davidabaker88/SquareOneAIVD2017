@@ -77,25 +77,25 @@ void loop() {
   BinaryConverterAndOutput((sizeof(outPinArray1)/sizeof(outPinArray1[0])),dis,outPinArray1,WheelTrashhold);
   
   int dis2 = irSense2.distance();
-  BinaryConverterAndOutput((sizeof(outPinArray2)/sizeof(outPinArray2[0])),dis,outPinArray2,FrontTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray2)/sizeof(outPinArray2[0])),dis2,outPinArray2,FrontTrashhold);
   
   int dis3 = irSense3.distance();
-  BinaryConverterAndOutput((sizeof(outPinArray3)/sizeof(outPinArray3[0])),dis,outPinArray3,FrontTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray3)/sizeof(outPinArray3[0])),dis3,outPinArray3,FrontTrashhold);
   
   int dis4 = irSense4.distance();
-  BinaryConverterAndOutput((sizeof(outPinArray4)/sizeof(outPinArray4[0])),dis,outPinArray4,WheelTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray4)/sizeof(outPinArray4[0])),dis4,outPinArray4,WheelTrashhold);
   
   int dis5 = irSense5.distance();
-  BinaryConverterAndOutput((sizeof(outPinArray5)/sizeof(outPinArray5[0])),dis,outPinArray5,BacksideTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray5)/sizeof(outPinArray5[0])),dis5,outPinArray5,BacksideTrashhold);
   
   int dis6 = irSense6.distance();
-  BinaryConverterAndOutput((sizeof(outPinArray6)/sizeof(outPinArray6[0])),dis,outPinArray6,BackTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray6)/sizeof(outPinArray6[0])),dis6,outPinArray6,BackTrashhold);
   
   int dis7 = irSense7.distance();
-  BinaryConverterAndOutput((sizeof(outPinArray7)/sizeof(outPinArray7[0])),dis,outPinArray7,BackTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray7)/sizeof(outPinArray7[0])),dis7,outPinArray7,BackTrashhold);
   
   int dis8 = irSense8.distance();
-  BinaryConverterAndOutput((sizeof(outPinArray8)/sizeof(outPinArray8[0])),dis,outPinArray8,BacksideTrashhold);
+  BinaryConverterAndOutput((sizeof(outPinArray8)/sizeof(outPinArray8[0])),dis8,outPinArray8,BacksideTrashhold);
 
   //sonic sensors
  // cm[0] =sonarSensorA.ping_median(10 ,MAX_DISTANCE);
@@ -149,6 +149,5 @@ void BinaryConverterAndOutput(int numBits, int distanceConv,int outPinArray[],in
         digitalWrite(outPinArray[i], LOW);
       }
     }
-    Serial.println();
 }
 

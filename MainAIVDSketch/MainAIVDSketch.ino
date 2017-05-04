@@ -29,7 +29,7 @@
 
 //Start Steering Defines and Global Variables
 const int STEERING_PIN = 22;
-const double STEERING_P = 1.0;
+const double STEERING_P = 2.0;
 const double STEERING_I = 0;
 const double STEERING_D = 0;
 
@@ -162,6 +162,7 @@ void setup() {
     //gps.init();
     //End GPS Setup
     //Start Magnetic Setup
+	pinMode(A0, INPUT);
     //End Magnetic Setup
     //Start Sensor Arduino Setup
     //End Sensor Arduino Setup
@@ -188,6 +189,9 @@ void loop() {
 
     pid.Compute();
     steering(out);
+
+	//Serial.print(in); Serial.print(", "); Serial.print(sp); Serial.print(", "); Serial.println(out);
+	//Serial.println(analogRead(0));
 
     if (currentTask == none) {
 		Current = 5;
@@ -228,6 +232,7 @@ void loop() {
                 time.restart();
 				motorCount = 0;
                 t1Stage = 4;
+				Serial.println("Turned");
             }
             break;
         case 4:
@@ -237,6 +242,7 @@ void loop() {
                 setSpeed();
 				t1Stage = 5;
                 //done
+				Serial.println("Done");
             }
 			break;
         }
@@ -254,15 +260,6 @@ void loop() {
 			t2Stage++;
 			break;
 		case 1:
-			Serial.print(digitalRead(33));
-			Serial.print(digitalRead(34));
-			Serial.print(digitalRead(35));
-			Serial.print(digitalRead(36));
-			Serial.print(", ");
-			Serial.print(digitalRead(37));
-			Serial.print(digitalRead(38));
-			Serial.print(digitalRead(39));
-			Serial.println(digitalRead(40));
 			if (!!digitalRead(SONIC_FRONT_PIN) || !!IRDistance(IR_FRONT_LEFT_PIN) || !!IRDistance(IR_FRONT_RIGHT_PIN))
 			{
 				Current = 0;
@@ -523,12 +520,12 @@ void steering(float degreeIn) {
 int ToDecimal(const int pins[], int length = -1)
 {
   if (length == -1)
-  length = sizeof(pins) / sizeof(pins[0]);
+	length = sizeof(pins) / sizeof(pins[0]);
 
-  int num;
+  int num = 0;
   for (int i = 0; i < length; i++)
-    if (digitalRead(pins[i]) == 1)
-      num += pow(2, i);
+	  if (digitalRead(pins[i]) == 1)
+		  num += lround(pow(2, i));
 
   return num;
 }
@@ -536,6 +533,9 @@ int ToDecimal(const int pins[], int length = -1)
 //Takes IR pins from least to most and converts into distance (cm)
 int IRDistance(const int pins[], int length = -1)
 {
+	if (length == -1)
+		length = sizeof(pins) / sizeof(pins[0]);
+
 	return (int)(ToDecimal(pins, length) * (150.0 / pow(2, length)));
 }
 
