@@ -79,13 +79,13 @@ def findLights(img):
             print meanv
             
             #'''
-            cv2.imshow('img', img)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
+            #cv2.imshow('img', img)
+            #cv2.waitKey(0)
+            #cv2.destroyAllWindows()
             #'''
-    #print redPin
-    #print ylwPin
-    #print grnPin
+    print redPin
+    print ylwPin
+    print grnPin
     return (redPin, ylwPin, grnPin)
 
 def findCircles(img):
@@ -118,7 +118,7 @@ pio.setup(redPin, pio.OUT)
 pio.setup(ylwPin, pio.OUT)
 pio.setup(grnPin, pio.OUT)
 
-img = cv2.imread('TrafficLight2.jpg')
+#img = cv2.imread('TrafficLight2.jpg')
 
 with picamera.PiCamera() as camera:
     camera.resolution = (320, 240)
