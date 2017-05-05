@@ -16,7 +16,7 @@ int IR_PIN5 = 5;
 int IR_PIN6 = 6;
 int IR_PIN7 = 7;
 int IR_PIN8 = 8;
-
+int IR_PIN0 = 0;
 
 //Precision = Threshold / ((2^numbits)-1); IE: Precesion = 50 cm when numbits = 2 & Threshold = 150
 
@@ -28,6 +28,7 @@ int outPinArray5[] = {44};//back right side
 int outPinArray6[] = {45,46,47,48};// back right
 int outPinArray7[] = {49,50,51,52};//back left
 int outPinArray8[] = {53};//back left side
+int outPinArray0[] = {23};//front middle
 
 int WheelTrashhold = 150;
 int FrontTrashhold = 150;
@@ -48,6 +49,7 @@ SharpIR irSense5(IR_PIN5, IR_MODEL);
 SharpIR irSense6(IR_PIN6, IR_MODEL);
 SharpIR irSense7(IR_PIN7, IR_MODEL);
 SharpIR irSense8(IR_PIN8, IR_MODEL);
+SharpIR irSense0(IR_PIN0, IR_MODEL);
 
 NewPing sonarSensorA(9, 8, MAX_DISTANCE);
 NewPing sonarSensorB(6, 5, MAX_DISTANCE); // (trigger, echo)
@@ -97,6 +99,8 @@ void loop() {
   int dis8 = irSense8.distance();
   BinaryConverterAndOutput((sizeof(outPinArray8)/sizeof(outPinArray8[0])),dis8,outPinArray8,BacksideTrashhold);
 
+  int dis0 = irSense0.distance();
+  BinaryConverterAndOutput((sizeof(outPinArray0)/sizeof(outPinArray0[0])),dis0,outPinArray0,WheelTrashhold);
   //sonic sensors
  // cm[0] =sonarSensorA.ping_median(10 ,MAX_DISTANCE);
  // cm[1] =sonarSensorB.ping_median(10 ,MAX_DISTANCE);

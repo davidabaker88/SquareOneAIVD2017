@@ -29,7 +29,7 @@
 
 //Start Steering Defines and Global Variables
 const int STEERING_PIN = 22;
-const double STEERING_P = 2.0;
+const double STEERING_P = 5.0;
 const double STEERING_I = 0;
 const double STEERING_D = 0;
 
@@ -45,7 +45,7 @@ float CountDistance(int count);
 
 const int INTERRUPT_PIN = 2;
 const float WHEEL_CIRCUMFERENCE = 10 * PI * 0.0254;
-const float TURN_RADIUS = 2.2f;
+const float TURN_RADIUS = 3;
 
 long motorCount = 0;
 
@@ -63,6 +63,8 @@ bool enablePID;
 //will make the car go backwards.
 void setSpeed();
 void setBrake();
+
+const float DRIVE_CURRENT = 15;
 //End Drive Defines and Global Variables
 
 //Start 9DoF Defines and Global Variables
@@ -135,6 +137,7 @@ float startAngle;
 const float REQUIRED_SPACE = 2;
 //task 5
 //task 6
+int t6Stage;
 //task 7
 const float lat[] = { 0, 0 };
 const float lon[] = { 0, 0 };
@@ -153,7 +156,7 @@ void setup() {
     //Start Steering Setup
     myServo.attach(STEERING_PIN);
 	pid.SetMode(AUTOMATIC);
-	pid.SetOutputLimits(-60, 60);
+	pid.SetOutputLimits(-50, 50);
     enablePID = true;
     //End Steering Setup
     //Start Drive Setup
@@ -185,6 +188,8 @@ void setup() {
 
 void loop() {
 
+    //setSpeed();
+
     currentTask = (TASK)ToDecimal(TASK_PIN, 3);
 
     gyro.loop();
@@ -203,15 +208,14 @@ void loop() {
 
 	//Serial.print(in); Serial.print(", "); Serial.print(sp); Serial.print(", "); Serial.println(out);
 	//Serial.println(analogRead(0));
-	//Serial.println(digitalRead(IR_FRONT_LEFT_PIN[0]) | digitalRead(IR_FRONT_LEFT_PIN[1]) | digitalRead(IR_FRONT_LEFT_PIN[2]) | digitalRead(IR_FRONT_LEFT_PIN[3]));
 
     if (currentTask == none) {
-		Current = 5;
-		setSpeed();
+		Current = 0;
+        //setSpeed();
+        //25Serial.println(motorCount);
     }
     else if (currentTask == one)
     {
-
         //start task 1 Code:  go forward X meters turn right.
         switch (t1Stage)
         {
@@ -223,14 +227,13 @@ void loop() {
         case 1:
             if (time.hasPassed(5000))
             {
-				Current = 5;
-                setSpeed();
+				Current = DRIVE_CURRENT;
                 time.restart();
                 t1Stage = 2;
             }
             break;
         case 2:
-			//Serial.println("Motor on");
+			Serial.print(Current); Serial.println(CountDistance(motorCount));
             if (CountDistance(motorCount) >= 3)
             {
                 time.restart();
@@ -267,7 +270,7 @@ void loop() {
 		{
 		case 0:
 			time.restart();
-			Current = 5;
+			Current = DRIVE_CURRENT;
 			setSpeed();
 			t2Stage++;
 			break;
@@ -283,12 +286,12 @@ void loop() {
 				Current = 0;
 				setSpeed();
 				t2Stage++;
-
+             +   Serial.println("STOP 11m");
 				//done
 			}
 			else 
 			{
-				Current = 5;
+				Current = DRIVE_CURRENT;
 				setSpeed();
 			}
 			break;
@@ -304,7 +307,7 @@ void loop() {
     {
         //start task 4 Code:  avoid obstacles/relatively straight.
 
-		Current = 5;
+		Current = DRIVE_CURRENT;
 		setSpeed();
 
 		switch (t4Stage)
@@ -315,28 +318,26 @@ void loop() {
 			if (!!IRDistance(IR_FRONT_LEFT_PIN))
 			{
 				motorCount = 0;
-				Current = -5;
+				Current = -DRIVE_CURRENT;
 				setSpeed();
-
 				t4Stage = 1;
-				Serial.println("Back up 1");
+				Serial.println("Back up");
 			}
 			else if (!!IRDistance(IR_FRONT_RIGHT_PIN) || !!digitalRead(SONIC_FRONT_PIN))
 			{
 				motorCount = 0;
-				Current = -5;
+				Current = -DRIVE_CURRENT;
 				setSpeed();
 
-				t4Stage  = 2;
-				Serial.println("Back up 2");
+				t4Stage = 2;
+				Serial.println("Back up");
 			}
 			break;
 
 		case 1:
-			Serial.println(CountDistance(motorCount));
 			if (CountDistance(motorCount) <= -TURN_RADIUS)
 			{
-				Current = 5;
+				Current = DRIVE_CURRENT;
 				setSpeed();
 				sp += 90;
 				t1Stage = 3;
@@ -347,7 +348,7 @@ void loop() {
 		case 2:
 			if (CountDistance(motorCount) <= -TURN_RADIUS)
 			{
-				Current = 5;
+				Current = DRIVE_CURRENT;
 				setSpeed();
 				sp -= 90;
 				t1Stage = 4;
@@ -362,11 +363,10 @@ void loop() {
 				if (!(!!IRDistance(IR_A_PILLAR_LEFT_PIN)))
 				{
 					sp = preTurnSp;
-					t4Stage = 5;
-					Serial.println("Back up again");
+					t4Stage = 3;
+					//more
 				}
 			}
-
 			break;
 		}
 
@@ -380,32 +380,15 @@ void loop() {
 			{
 				if (!(!!IRDistance(IR_A_PILLAR_RIGHT_PIN)))
 				{
-					motorCount = 0;
-					Current = -5;
-					setSpeed();
-
-					t4Stage = 5;
-					Serial.println("Back up again");
+					sp = preTurnSp;
+					t4Stage = 3;
 				}
 			}
 
 			break;
 		}
 
-		case 5:
-			if (CountDistance(motorCount) <= -TURN_RADIUS)
-			{
-				motorCount = 0;
-				Current = 5;
-				setSpeed();
-				sp = preTurnSp;
-
-				t4Stage = 6;
-				Serial.println("Turn back");
-			}
-			break;
-
-		case 6: //turned back forward
+		case 5: //turned back forward
 		{
 
 			int low = sp - 1;
@@ -413,10 +396,7 @@ void loop() {
 			int high = fmod(sp + 1, 360);
 
 			if (in >= low && in <= high)
-			{
 				t4Stage = 0;
-				Serial.println("Done, let's do it again!");
-			}
 
 			break;
 		}
@@ -426,12 +406,12 @@ void loop() {
     }
     else if (currentTask == five)
     {
-        enablePID = false;
         //start task 5 Code:  Parallel park.
+        enablePID = false;
         switch (t5Stage)
         {
-            case 0: 
-                Current = 5;
+            case 0: // Drive until a gap
+                Current = DRIVE_CURRENT;
                 setSpeed();
                 steering(0);
 
@@ -441,8 +421,8 @@ void loop() {
                     t5Stage++;
                 }
             break;
-            case 1: // measure distance
-                Current = 5;
+            case 1: // Measure gap
+                Current = DRIVE_CURRENT;
                 setSpeed();
                 steering(0);
                 if (!IRDistance(IR_FRONT_RIGHT_PIN))
@@ -455,16 +435,19 @@ void loop() {
                 }
                 else t5Stage--;
             break;
-            case 2:
+            case 2: // Stop when back sensor is at end of the gap
+                Current = DRIVE_CURRENT;
+                setSpeed();
+                steering(0);
                 if (!!IRDistance(IR_BACK_RIGHT_PIN))
                 {
                     Current = 0;
                     setBrake();
                 }
             break;
-            case 3:
-                steering(45);
-                Current = -3;
+            case 3: // Back into the space
+                steering(60);
+                Current = -DRIVE_CURRENT;
                 setSpeed();
 
                 if (!IRDistance(IR_A_PILLAR_RIGHT_PIN)) // Problems
@@ -472,9 +455,11 @@ void loop() {
                     t5Stage++;
                 }
             break;
-            case 4:
-                steering(-45);
-                Current = -3;
+            case 4: 
+                // Once a-pillar is at the back corner of the front car turn opposite and continue backing
+                // until gyroscope is at starting position
+                steering(-60);
+                Current = -DRIVE_CURRENT;
                 setBrake();
                 
                 if (gyro.getOrientation(Gyro::kXAxis) <= startAngle)
@@ -484,9 +469,10 @@ void loop() {
                 // back right too close
                 // front right too close to car in front              
             break;
-            case 6:
+            case 6: // Stop
                 Current = 0;
                 setBrake(); 
+                enablePID = true;
             break;
         }
         //end task5 Code
@@ -494,6 +480,35 @@ void loop() {
     else if (currentTask == six)
     {
         //start task 6 Code:  traffic light.
+        // red: right turn
+        // yellow: left turn
+        switch (t6Stage)
+        {
+            case 0:
+                Current = DRIVE_CURRENT;
+                setSpeed();
+                if (digitalRead(LIGHT_RED_PIN))
+                {
+                    t6Stage = 1;
+                }
+                else if (digitalRead(LIGHT_YELLOW_PIN))
+                {
+                    t6Stage = 2;
+                }
+            break;
+            case 1:
+                sp += 90;
+                setSpeed();
+                if (gyro.getOrientation(Gyro::kXAxis) >= sp - 1 && gyro.getOrientation(Gyro::kXAxis) <= sp + 1)
+                    t6Stage = 0;      
+            break;
+            case 2:
+                sp -= 90;
+                setSpeed();
+                if (gyro.getOrientation(Gyro::kXAxis) >= sp - 1 && gyro.getOrientation(Gyro::kXAxis) <= sp + 1)
+                    t6Stage = 0;
+            break;
+        }
         //end task6 Code
     }
     else if (currentTask == seven)
@@ -661,7 +676,7 @@ void Count()
 		}
 		else if (Current < 0) 
 		{
-			motorCount--;
+			motorCount-=10;
 			//Serial.println(motorCount);
 		}
 	}
@@ -669,5 +684,5 @@ void Count()
 
 float CountDistance(int count)
 {
-	return (count / (16.0 * 7)) * WHEEL_CIRCUMFERENCE;
+	return (count / (16.0 * 331.25)) * WHEEL_CIRCUMFERENCE;
 }
