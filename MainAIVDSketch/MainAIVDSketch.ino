@@ -494,6 +494,17 @@ void loop() {
     else if (currentTask == six)
     {
         //start task 6 Code:  traffic light.
+		Current = 5;
+		setSpeed();
+
+		if (digitalRead(LIGHT_RED_PIN))
+		{
+			sp += 90;
+		}
+		else if (digitalRead(LIGHT_YELLOW_PIN))
+		{
+			sp -= 90;
+		}
         //end task6 Code
     }
     else if (currentTask == seven)
