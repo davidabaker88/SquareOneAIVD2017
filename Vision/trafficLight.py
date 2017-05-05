@@ -28,8 +28,8 @@ def findLights(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    circles = cv2.HoughCircles(gray, cv2.cv.CV_HOUGH_GRADIENT, 1, minDist=40, param1=40, param2=35, minRadius=0, maxRadius=50)
-    print 'Checked'
+    circles = cv2.HoughCircles(gray, cv2.cv.CV_HOUGH_GRADIENT, 1, minDist=40, param1=50, param2=30, minRadius=0, maxRadius=30)
+    #print 'Checked'
 
     if circles is not None:
         circles = np.round(circles[0, :]).astype('int')
@@ -45,37 +45,47 @@ def findLights(img):
             i = i + 1
         
         if trafficCircles is not None:
+            meanv = [0, 0, 0]
+            index = 0
+            trafficCircles = sorted(trafficCircles, key=itemgetter(1))
             for (x, y, r) in trafficCircles:
                 cv2.circle(img, (x, y), r, (255, 0, 0), 2)
-                print(str(x) + ',' + str(y) + ': ' + str(r))
+                #print(str(x) + ',' + str(y) + ': ' + str(r))
 
-                #Check average color of area
-                roi = hsv[y - r / 2 : y + r / 2, x - r / 2 + 1 : x + r / 2 + 1]
+                ###Check average color of area
+                roi = hsv[y - r / 3 : y + r / 3, x - r / 3 + 1 : x + r / 3 + 1]
 
-                #Modify hsv value
+                ###Modify hsv value
                 roi[:, :, 0] = (roi[:, :, 0] + 65) % 180
                 
                 mean = cv2.mean(roi)
-                print mean
+                #print mean
 
-                #Red
-                if (inColorRange(mean, (45, 100, 200), (72, 255, 255))):
-                    redPin = True
+                meanv[index] = mean[2]
+                index = index + 1
 
-                #Yellow
-                elif (inColorRange(mean, (79, 90, 220), (104, 255, 255))):
-                    ylwPin = True
-
-                #Green
-                elif (inColorRange(mean, (105, 120, 120), (137, 255, 255))):
-                   grnPin = True
-
+            if (meanv[0] > meanv[1] and meanv[0] > meanv[2] and meanv[0] > 200):
+                redPin = True
+                ylwPin = False
+                grnPin = False
+            elif (meanv[1] > meanv[0] and meanv[1] > meanv[2] and meanv[1] > 200):
+                redPin = False
+                ylwPin = True
+                grnPin = False
+            elif (meanv[2] > meanv[1] and meanv[2] > meanv[1] and meanv[2] > 180):
+                redPin = False
+                ylwPin = False
+                grnPin = True
+            print meanv
+            
             #'''
             cv2.imshow('img', img)
             cv2.waitKey(0)
             cv2.destroyAllWindows()
             #'''
-
+    #print redPin
+    #print ylwPin
+    #print grnPin
     return (redPin, ylwPin, grnPin)
 
 def findCircles(img):
@@ -114,8 +124,12 @@ with picamera.PiCamera() as camera:
     camera.resolution = (320, 240)
     
     while True:
-        pins = findLights(takePicture(camera))
+        for i in range(5):
+            pins = findLights(takePicture(camera))
 
+            if 1 in pins:
+                break
+            
         pio.output(redPin, pins[0])
         pio.output(ylwPin, pins[1])
         pio.output(grnPin, pins[2])
