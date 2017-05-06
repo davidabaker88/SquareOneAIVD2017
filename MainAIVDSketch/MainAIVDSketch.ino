@@ -34,8 +34,9 @@ const double STEERING_I = 0;
 const double STEERING_D = 0;
 
 double in, out, sp;
+const double SETPOINT = 0;
 double pidIn;
-PID pid{ &pidIn, &out, 0, STEERING_P, STEERING_I, STEERING_D, DIRECT };
+PID pid{ &pidIn, &out, &SETPOINT, STEERING_P, STEERING_I, STEERING_D, DIRECT };
 
 Servo myServo;
 
@@ -191,7 +192,7 @@ void loop() {
     //setSpeed();
 
     currentTask = (TASK)ToDecimal(TASK_PIN, 3);
-
+    Serial.print(currentTask);
     gyro.loop();
 
     if (enablePID) 
@@ -211,7 +212,7 @@ void loop() {
 
     if (currentTask == none) {
 		Current = 0;
-        //setSpeed();
+        setSpeed();
         //25Serial.println(motorCount);
     }
     else if (currentTask == one)
@@ -233,7 +234,7 @@ void loop() {
             }
             break;
         case 2:
-			Serial.print(Current); Serial.println(CountDistance(motorCount));
+			//Serial.print(Current); Serial.println(CountDistance(motorCount));
             if (CountDistance(motorCount) >= 3)
             {
                 time.restart();
@@ -275,18 +276,17 @@ void loop() {
 			t2Stage++;
 			break;
 		case 1:
-			if (!!digitalRead(SONIC_FRONT_PIN) || !!IRDistance(IR_FRONT_LEFT_PIN) || !!IRDistance(IR_FRONT_RIGHT_PIN))
+			if (!!IRDistance(IR_FRONT_LEFT_PIN) || !!IRDistance(IR_FRONT_RIGHT_PIN))
 			{
 				Current = 0;
 				setSpeed();
-				Serial.println("STOP");
 			}
 			else if (CountDistance(motorCount) >= 11)
 			{
 				Current = 0;
 				setSpeed();
 				t2Stage++;
-             +   Serial.println("STOP 11m");
+                //Serial.println("STOP 11m");
 				//done
 			}
 			else 
@@ -480,7 +480,6 @@ void loop() {
     else if (currentTask == six)
     {
         //start task 6 Code:  traffic light.
-<<<<<<< HEAD
         // red: right turn
         // yellow: left turn
         switch (t6Stage)
@@ -488,41 +487,29 @@ void loop() {
             case 0:
                 Current = DRIVE_CURRENT;
                 setSpeed();
-                if (digitalRead(LIGHT_RED_PIN))
+                if (digitalRead(LIGHT_RED_PIN) > 0)
                 {
                     t6Stage = 1;
+                    sp += 90;
+                    //Serial.print("Red");
                 }
-                else if (digitalRead(LIGHT_YELLOW_PIN))
+                else if (digitalRead(LIGHT_YELLOW_PIN) > 0)
                 {
-                    t6Stage = 2;
+                    t6Stage = 1;
+                    sp -= 90;
+                    //Serial.print("Yellow");
                 }
             break;
             case 1:
-                sp += 90;
                 setSpeed();
                 if (gyro.getOrientation(Gyro::kXAxis) >= sp - 1 && gyro.getOrientation(Gyro::kXAxis) <= sp + 1)
-                    t6Stage = 0;      
+                    t6Stage = 0;     
             break;
             case 2:
-                sp -= 90;
+                Current = 0;
                 setSpeed();
-                if (gyro.getOrientation(Gyro::kXAxis) >= sp - 1 && gyro.getOrientation(Gyro::kXAxis) <= sp + 1)
-                    t6Stage = 0;
             break;
         }
-=======
-		Current = 5;
-		setSpeed();
-
-		if (digitalRead(LIGHT_RED_PIN))
-		{
-			sp += 90;
-		}
-		else if (digitalRead(LIGHT_YELLOW_PIN))
-		{
-			sp -= 90;
-		}
->>>>>>> aabaab4c8330e672f4fee2e02874e100d0a6b962
         //end task6 Code
     }
     else if (currentTask == seven)
