@@ -16,7 +16,6 @@ int IR_PIN5 = 5;
 int IR_PIN6 = 6;
 int IR_PIN7 = 7;
 int IR_PIN8 = 8;
-int IR_PIN0 = 9;
 
 //Precision = Threshold / ((2^numbits)-1); IE: Precesion = 50 cm when numbits = 2 & Threshold = 150
 
@@ -28,7 +27,6 @@ int outPinArray5[] = {44};//back right side
 int outPinArray6[] = {45,46,47,48};// back right
 int outPinArray7[] = {49,50,51,52};//back left
 int outPinArray8[] = {53};//back left side
-int outPinArray0[] = {23};//front middle
 
 int WheelTrashhold = 150;
 int FrontTrashhold = 150;
@@ -49,7 +47,6 @@ SharpIR irSense5(IR_PIN5, IR_MODEL);
 SharpIR irSense6(IR_PIN6, IR_MODEL);
 SharpIR irSense7(IR_PIN7, IR_MODEL);
 SharpIR irSense8(IR_PIN8, IR_MODEL);
-SharpIR irSense0(IR_PIN0, IR_MODEL);
 
 NewPing sonarSensorA(9, 8, MAX_DISTANCE);
 NewPing sonarSensorB(6, 5, MAX_DISTANCE); // (trigger, echo)
@@ -98,14 +95,11 @@ void loop() {
   
   int dis8 = irSense8.distance();
   BinaryConverterAndOutput((sizeof(outPinArray8)/sizeof(outPinArray8[0])),dis8,outPinArray8,BacksideTrashhold);
-
-  int dis0 = irSense0.distance();
-  BinaryConverterAndOutput((sizeof(outPinArray0)/sizeof(outPinArray0[0])),dis0,outPinArray0,WheelTrashhold);
+  
   //sonic sensors
- // cm[0] =sonarSensorA.ping_median(10 ,MAX_DISTANCE);
- // cm[1] =sonarSensorB.ping_median(10 ,MAX_DISTANCE);
+  cm[0] =sonarSensorA.ping_median(10 ,MAX_DISTANCE);
+  cm[1] =sonarSensorB.ping_median(10 ,MAX_DISTANCE);
   //Serial.println(cm[0]);
-  Serial.print(" 0  ");  Serial.println(dis0);
   //Serial.print(" 2 ");  Serial.println(dis2);
   //Serial.print(" 3 ");  Serial.println(dis3);
   //Serial.print(" 4 ");  Serial.println(dis4);
@@ -121,13 +115,13 @@ void loop() {
   //Serial.print(digitalRead(outPinArray6[0])); Serial.print(digitalRead(outPinArray6[1])); Serial.print(digitalRead(outPinArray6[2])); Serial.println(digitalRead(outPinArray6[3]));//45-48
   //Serial.print(digitalRead(outPinArray7[0])); Serial.print(digitalRead(outPinArray7[1])); Serial.print(digitalRead(outPinArray7[2])); Serial.println(digitalRead(outPinArray7[3]));//49-52
   //Serial.println(digitalRead(outPinArray8[0]));//53
- /*if  ((cm[0] < FRONT_THRESHOLD || cm[1] < FRONT_THRESHOLD) && (cm[0] > 0 || cm[1] > 0))
+  if  ((cm[0] < FRONT_THRESHOLD || cm[1] < FRONT_THRESHOLD) && (cm[0] > 0 || cm[1] > 0))
   {
     Quadrant[0] = true;
   }
   else {
     Quadrant[0] = false;
-  }*/
+  }
 }
 
 
